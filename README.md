@@ -4,7 +4,8 @@ A Next.js web application for practicing English writing skills from Burmese (`�
 
 ## Features
 
-- **Burmese Prompts (`မြန်မာဘာသာ`)**: Authentic everyday, workplace, travel, dining, grammar, and opinion prompts with expandable hints and grammar notes.
+- **Lessons Guide (Default Page `/`)**: Interactive English Tenses & Writing Guide with Past–Now–Future timeline visuals, `+ / - / ?` sentence structure formulas, Burmese→English worked examples, a side-by-side 6-tense comparison table, common mistake callouts, and writing tips & tricks for Burmese learners.
+- **Burmese Prompts (`/practice`)**: Authentic everyday, workplace, travel, dining, grammar, and opinion prompts with expandable hints and grammar notes.
 - **Animated English Typing Studio**: Live keystroke rhythm indicator, spring-animated word chips, shake feedback on retry, confetti celebration burst on correct answers, and word-by-word diff comparison.
 - **Lesson Categories**: Choose from 6 seeded categories with per-category progress tracking persisted in SQLite.
 - **Random Categories**:
