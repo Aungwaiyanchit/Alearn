@@ -1,0 +1,11 @@
+# Local SQLite databases
+data/
+
+# Local Next.js build output
+.next/
+
+# Git metadata
+.git/
+
+# Local environment files
+.env*.local

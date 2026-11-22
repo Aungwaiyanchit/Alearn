@@ -38,3 +38,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. The SQLite 
 - `bun run lint` — Run Biome lint and formatting checks
 - `bun run lint:fix` — Auto-fix formatting and lint issues with Biome
 - `bun run typecheck` — Run TypeScript type checking
+
+## Deploying to Vercel
+
+This project includes [`vercel.json`](./vercel.json) configured for the Next.js framework and Vercel's native Bun runtime (`bunVersion: "1.x"`).
+
+> **Note on SQLite on Vercel:** When deployed to Vercel (`VERCEL=1`), the app automatically stores its SQLite file at `/tmp/alearn.sqlite` because serverless project directories are read-only. Seeded categories and lessons load automatically on cold start, while user attempts and custom random categories stored in `/tmp` are ephemeral across serverless cold starts. For durable cloud persistence later, swap the SQLite repository for a hosted database (e.g. Turso/LibSQL or Postgres).

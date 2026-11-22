@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
+import { resolveDatabasePath } from "@/db/config";
 import { SEED_CATEGORIES, SEED_QUESTIONS } from "@/db/seed-data";
 
 const globalForDb = globalThis as unknown as {
@@ -122,10 +123,9 @@ export function getDb(): Database {
     return globalForDb.alearnDb;
   }
 
-  const dataDir = path.join(process.cwd(), "data");
-  mkdirSync(dataDir, { recursive: true });
+  const dbPath = resolveDatabasePath();
+  mkdirSync(path.dirname(dbPath), { recursive: true });
 
-  const dbPath = path.join(dataDir, "alearn.sqlite");
   const db = new Database(dbPath, { create: true });
 
   initializeSchema(db);
