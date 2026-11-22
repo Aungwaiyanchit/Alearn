@@ -3,10 +3,8 @@
 import { ArrowRight, PenLine } from "lucide-react";
 import Link from "next/link";
 import { GuideHero } from "@/components/guide/GuideHero";
-import { TenseComparisonTable } from "@/components/guide/TenseComparisonTable";
 import { TenseLessonDetail } from "@/components/guide/TenseLessonDetail";
 import { TenseLessonList } from "@/components/guide/TenseLessonList";
-import { WritingTipsGrid } from "@/components/guide/WritingTipsGrid";
 import { AppHeader } from "@/components/layout/AppHeader";
 import type { PracticeStats } from "@/types/practice";
 
@@ -29,10 +27,10 @@ export function LessonsGuideShell({
         showRandomModalTrigger={false}
       />
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-8 sm:px-6 lg:py-10">
+      <main className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 lg:py-10">
         <GuideHero stats={stats} categoryCount={categoryCount} />
 
-        {/* Interactive Curriculum + Lesson Reader */}
+        {/* Interactive Curriculum + Lesson Reader (with contextual Cheat Sheet & Tips) */}
         <section className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
           <div className="lg:sticky lg:top-24 lg:col-span-4">
             <TenseLessonList />
@@ -41,12 +39,6 @@ export function LessonsGuideShell({
             <TenseLessonDetail />
           </div>
         </section>
-
-        {/* Side-by-Side Comparison Cheat Sheet */}
-        <TenseComparisonTable />
-
-        {/* Tips & Tricks */}
-        <WritingTipsGrid />
 
         {/* Clean Practice Callout */}
         <section className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-blue-200/80 bg-blue-50/70 p-6 sm:flex-row sm:items-center sm:p-7">

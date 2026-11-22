@@ -31,6 +31,13 @@ export interface CommonMistake {
   reason: string;
 }
 
+export interface LessonCheatSheetRow {
+  pattern: string;
+  english: string;
+  burmese: string;
+  usage: string;
+}
+
 export interface TenseLesson {
   id: string;
   title: string;
@@ -47,6 +54,8 @@ export interface TenseLesson {
   signalWords: string[];
   examples: TenseExample[];
   mistake: CommonMistake;
+  cheatSheet: LessonCheatSheetRow[];
+  relatedTipIds: string[];
   practiceCategoryId: string;
 }
 
@@ -59,13 +68,4 @@ export interface WritingTip {
   trick: string;
   before: string;
   after: string;
-}
-
-export interface TenseComparisonRow {
-  tenseId: string;
-  tenseName: string;
-  burmeseLabel: string;
-  englishSentence: string;
-  burmeseMeaning: string;
-  focus: string;
 }

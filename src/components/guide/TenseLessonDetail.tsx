@@ -3,6 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
+import { LessonRelatedCheatSheet } from "@/components/guide/LessonRelatedCheatSheet";
+import { LessonRelatedTips } from "@/components/guide/LessonRelatedTips";
 import { TenseTimelineVisual } from "@/components/guide/TenseTimelineVisual";
 import { TENSE_LESSONS } from "@/data/lessons-guide-data";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
@@ -195,6 +197,15 @@ export function TenseLessonDetail() {
           </div>
           <p className="mt-2 text-xs text-slate-500">{lesson.mistake.reason}</p>
         </div>
+
+        {/* Related Quick Cheat Sheet */}
+        <LessonRelatedCheatSheet
+          rows={lesson.cheatSheet}
+          lessonTitle={lesson.title}
+        />
+
+        {/* Related Writing Tips & Tricks */}
+        <LessonRelatedTips tipIds={lesson.relatedTipIds} />
 
         {/* Prev / Next Lesson Footer */}
         <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4">

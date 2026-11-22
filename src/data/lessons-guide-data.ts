@@ -1,8 +1,103 @@
-import type {
-  TenseComparisonRow,
-  TenseLesson,
-  WritingTip,
-} from "@/types/guide";
+import type { TenseLesson, WritingTip } from "@/types/guide";
+
+export const WRITING_TIPS: WritingTip[] = [
+  {
+    id: "tip-svo",
+    tag: "structure",
+    title: "Flip Burmese SOV into English SVO",
+    burmeseTitle: "ဝါကျတည်ဆောက်ပုံ ပြောင်းလဲခြင်း",
+    summary:
+      "Burmese places the verb at the end (Subject + Object + Verb), while English puts the verb immediately after the subject.",
+    trick:
+      "Find WHO (Subject) and ACTION (Verb) first — lock them in spots #1 and #2, then add details (what, where, when).",
+    before: "I + every day + English + practice.",
+    after: "I + practice + English + every day.",
+  },
+  {
+    id: "tip-prepositions",
+    tag: "grammar",
+    title: "The AT → ON → IN Time Triangle",
+    burmeseTitle: "အချိန်ပြဝိဘတ်များ (at / on / in)",
+    summary:
+      "Move from exact to broad: AT (8 PM), ON (Monday, May 5), IN (July, 2026, the morning).",
+    trick:
+      "Skip the preposition completely before 'today', 'tomorrow', 'yesterday', 'this afternoon', and 'next Monday'.",
+    before: "We have a meeting in this afternoon on 3 PM.",
+    after: "We have a meeting this afternoon at 3 PM.",
+  },
+  {
+    id: "tip-articles",
+    tag: "grammar",
+    title: "Quick Rule for a, an, and the",
+    burmeseTitle: "Article အသုံးပြုနည်း",
+    summary:
+      "Because Burmese doesn't use articles, it is easy to leave them out before singular countable nouns.",
+    trick:
+      "Use 'a/an' when introducing an item for the first time ('a report'). Switch to 'the' when both reader and writer know which one ('the report').",
+    before: "I will send report before deadline.",
+    after: "I will send the report before the deadline.",
+  },
+  {
+    id: "tip-verb-be",
+    tag: "grammar",
+    title: "Don't Double am/is/are with Action Verbs",
+    burmeseTitle: "Verb to be နှင့် ကြိယာ တွဲသုံးမှုသတိထားရန်",
+    summary:
+      "Words like 'agree', 'understand', and 'need' are already verbs — they do not need 'am / is / are' in front.",
+    trick:
+      "Only pair 'am/is/are' with adjectives ('am confident'), nouns ('am a student'), or -ing/passive verbs ('am writing', 'was delayed').",
+    before: "I am agree with your idea.",
+    after: "I agree with your idea.",
+  },
+  {
+    id: "tip-used-to-vs-be-used-to",
+    tag: "grammar",
+    title: "used to + V1 vs be used to + V-ing",
+    burmeseTitle: "used to နှင့် be used to ကွာခြားချက်",
+    summary:
+      "'used to + V1' is a past habit you stopped; 'be used to + V-ing/noun' means something feels normal to you now.",
+    trick:
+      "Look for 'am / is / are' in front! If there is a 'be' verb, follow 'used to' with '-ing' or a noun.",
+    before: "I am used to wake up early.",
+    after: "I am used to waking up early.",
+  },
+  {
+    id: "tip-will-vs-going-to",
+    tag: "grammar",
+    title: "will vs be going to Shortcut",
+    burmeseTitle: "will နှင့် be going to ခွဲသုံးနည်း",
+    summary:
+      "Both talk about the future, but the timing of your decision decides which one sounds more natural.",
+    trick:
+      "Decided BEFORE talking? Use 'be going to'. Decided RIGHT NOW or making a promise? Use 'will'.",
+    before: "I already bought tickets — I will fly to Bagan tomorrow.",
+    after: "I already bought tickets — I am going to fly to Bagan tomorrow.",
+  },
+  {
+    id: "tip-connectors",
+    tag: "vocabulary",
+    title: "because vs because of",
+    burmeseTitle: "အကြောင်းပြချက် ချိတ်ဆက်စကားလုံးများ",
+    summary:
+      "Connecting ideas cleanly makes your English sound fluent and logical.",
+    trick:
+      "Follow 'because' with a full clause (subject + verb). Follow 'because of' or 'due to' with just a noun phrase.",
+    before: "My flight was delayed because the bad weather.",
+    after: "My flight was delayed because of the bad weather.",
+  },
+  {
+    id: "tip-checklist",
+    tag: "polish",
+    title: "The 5-Second Writing Check",
+    burmeseTitle: "မတင်ခင် ၅ စက္ကန့် ပြန်စစ်နည်း",
+    summary:
+      "Catch 80% of writing slips before hitting Enter with three rapid checks.",
+    trick:
+      "1) Does the time word match the verb tense? 2) Does 'he/she/it' have '-s'? 3) Did you capitalize 'I' and finish with '.' or '?'?",
+    before: "yesterday i go to station and buy ticket",
+    after: "Yesterday, I went to the station and bought a ticket.",
+  },
+];
 
 export const TENSE_LESSONS: TenseLesson[] = [
   // ── CORE TENSES (6) ────────────────────────────────────────────
@@ -66,6 +161,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Don't forget the third-person '-s' after he, she, it, or singular nouns.",
     },
+    cheatSheet: [
+      {
+        pattern: "I / You / We / They + V1",
+        english: "I write every day.",
+        burmese: "ကျွန်တော် နေ့တိုင်း ရေးတယ်။",
+        usage: "Base verb, no -s",
+      },
+      {
+        pattern: "He / She / It + V1-s",
+        english: "She writes every day.",
+        burmese: "သူမ နေ့တိုင်း ရေးတယ်။",
+        usage: "Add -s or -es",
+      },
+      {
+        pattern: "don't / doesn't + V1",
+        english: "He doesn't write at night.",
+        burmese: "သူ ညဘက် စာမရေးဘူး။",
+        usage: "Verb returns to V1",
+      },
+    ],
+    relatedTipIds: ["tip-svo", "tip-verb-be"],
     practiceCategoryId: "cat-daily",
   },
   {
@@ -121,6 +237,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Stative verbs (know, believe, like, want, agree) normally use Present Simple, not -ing.",
     },
+    cheatSheet: [
+      {
+        pattern: "Right now (am/is/are + V-ing)",
+        english: "I am writing an email now.",
+        burmese: "အခု အီးမေးလ် ရေးနေတယ်။",
+        usage: "In progress now",
+      },
+      {
+        pattern: "Routine contrast (V1)",
+        english: "I write emails every morning.",
+        burmese: "မနက်တိုင်း အီးမေးလ် ရေးတယ်။",
+        usage: "Use Present Simple for habits",
+      },
+      {
+        pattern: "Spelling rule (-e → -ing)",
+        english: "write → writing / make → making",
+        burmese: "e ဖြုတ်ပြီး ing ပေါင်း",
+        usage: "Drop silent -e",
+      },
+    ],
+    relatedTipIds: ["tip-verb-be", "tip-prepositions"],
     practiceCategoryId: "cat-daily",
   },
   {
@@ -178,6 +315,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Never use Present Perfect with finished past time words like 'yesterday' or 'last night'.",
     },
+    cheatSheet: [
+      {
+        pattern: "for + length of time",
+        english: "I have lived here for 5 years.",
+        burmese: "ငါးနှစ်ကြာ နေထိုင်လာခဲ့ပြီ။",
+        usage: "Duration (5 years, 2 hours)",
+      },
+      {
+        pattern: "since + start point",
+        english: "I have lived here since 2021.",
+        burmese: "၂၀၂၁ ကတည်းက နေထိုင်လာခဲ့ပြီ။",
+        usage: "Starting date/year",
+      },
+      {
+        pattern: "Finished time → Past Simple",
+        english: "I moved here in 2021.",
+        burmese: "၂၀၂၁ မှာ ပြောင်းလာခဲ့တယ်။",
+        usage: "Specific past date",
+      },
+    ],
+    relatedTipIds: ["tip-prepositions", "tip-checklist"],
     practiceCategoryId: "cat-grammar",
   },
   {
@@ -232,6 +390,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Once 'did' carries the past tense, the main verb returns to base form (V1).",
     },
+    cheatSheet: [
+      {
+        pattern: "Regular verb (+ed)",
+        english: "finish → finished / walk → walked",
+        burmese: "ပုံမှန်ကြိယာ +ed",
+        usage: "Most English verbs",
+      },
+      {
+        pattern: "Irregular verb (V2)",
+        english: "go → went / write → wrote / buy → bought",
+        burmese: "ပုံသဏ္ဌာန်ပြောင်း ကြိယာ",
+        usage: "Memorize common V2 forms",
+      },
+      {
+        pattern: "Negative / Question (did + V1)",
+        english: "Did you write? / I didn't write.",
+        burmese: "did ပါရင် V1 ပြန်သုံး",
+        usage: "Never use V2 after did",
+      },
+    ],
+    relatedTipIds: ["tip-checklist", "tip-prepositions"],
     practiceCategoryId: "cat-grammar",
   },
   {
@@ -280,6 +459,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Put '-ing' on the longer background activity and Past Simple on the shorter interrupting action.",
     },
+    cheatSheet: [
+      {
+        pattern: "I / He / She / It + was + V-ing",
+        english: "I was cooking when he arrived.",
+        burmese: "ချက်နေတုန်း သူရောက်လာတယ်။",
+        usage: "Interrupted background action",
+      },
+      {
+        pattern: "You / We / They + were + V-ing",
+        english: "We were walking while it was raining.",
+        burmese: "မိုးရွာနေတုန်း လမ်းလျှောက်နေခဲ့တယ်။",
+        usage: "Two parallel past actions",
+      },
+      {
+        pattern: "when vs while",
+        english: "when + V2  |  while + was/were V-ing",
+        burmese: "when (ရုတ်တရက်) / while (နေတုန်း)",
+        usage: "Connector choice",
+      },
+    ],
+    relatedTipIds: ["tip-svo", "tip-checklist"],
     practiceCategoryId: "cat-grammar",
   },
   {
@@ -327,6 +527,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       correct: "I will send the email tomorrow.",
       reason: "Never put 'to' after 'will' — follow directly with V1.",
     },
+    cheatSheet: [
+      {
+        pattern: "Promise / deadline (will + V1)",
+        english: "I will send it before 5 PM.",
+        burmese: "၅ နာရီမတိုင်ခင် ပို့ပေးမယ်။",
+        usage: "Commitment / offer",
+      },
+      {
+        pattern: "Prior plan (be going to + V1)",
+        english: "I am going to study tonight.",
+        burmese: "ဒီည စာလုပ်ဖို့ စီစဉ်ထားတယ်။",
+        usage: "Already decided earlier",
+      },
+      {
+        pattern: "Negative (won't + V1)",
+        english: "I won't forget your message.",
+        burmese: "မင်းစာကို မမေ့ပါဘူး။",
+        usage: "will not = won't",
+      },
+    ],
+    relatedTipIds: ["tip-will-vs-going-to", "tip-articles"],
     practiceCategoryId: "cat-work",
   },
 
@@ -390,6 +611,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "In negatives and questions with 'did / didn't', write 'use to' (without '-d').",
     },
+    cheatSheet: [
+      {
+        pattern: "used to + V1",
+        english: "I used to write in a notebook.",
+        burmese: "အရင်က စာအုပ်ထဲ ရေးလေ့ရှိခဲ့တယ်။",
+        usage: "Past habit (stopped)",
+      },
+      {
+        pattern: "didn't use to + V1",
+        english: "I didn't use to like coffee.",
+        burmese: "အရင်က ကော်ဖီမကြိုက်ခဲ့ဘူး။",
+        usage: "Drop '-d' after didn't",
+      },
+      {
+        pattern: "be used to + V-ing / noun",
+        english: "I am used to writing daily.",
+        burmese: "နေ့တိုင်းရေးရတာ အကျင့်ဖြစ်နေပြီ။",
+        usage: "Accustomed to (now)",
+      },
+    ],
+    relatedTipIds: ["tip-used-to-vs-be-used-to", "tip-checklist"],
     practiceCategoryId: "cat-grammar",
   },
   {
@@ -443,6 +685,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       correct: "I am going to visit my parents tomorrow.",
       reason: "Always include the 'be' verb (am / is / are) before 'going to'.",
     },
+    cheatSheet: [
+      {
+        pattern: "be going to + V1",
+        english: "I am going to practice tonight.",
+        burmese: "ဒီည လေ့ကျင့်ဖို့ စီစဉ်ထားတယ်။",
+        usage: "Prior plan / intention",
+      },
+      {
+        pattern: "Visual evidence",
+        english: "Look at the clouds! It's going to rain.",
+        burmese: "တိမ်တွေမည်းနေပြီ မိုးရွာတော့မယ်။",
+        usage: "Based on signs now",
+      },
+      {
+        pattern: "will + V1 (contrast)",
+        english: "Oh, I'll bring an umbrella then.",
+        burmese: "ဒါဆို ထီးယူသွားလိုက်မယ်။",
+        usage: "Instant decision now",
+      },
+    ],
+    relatedTipIds: ["tip-will-vs-going-to", "tip-prepositions"],
     practiceCategoryId: "cat-daily",
   },
   {
@@ -507,6 +770,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "'Must not' means 'it is forbidden'; use 'don't have to' to say something is not required.",
     },
+    cheatSheet: [
+      {
+        pattern: "should + V1",
+        english: "You should practice daily.",
+        burmese: "နေ့တိုင်း လေ့ကျင့်သင့်တယ်။",
+        usage: "Friendly advice",
+      },
+      {
+        pattern: "have to / has to + V1",
+        english: "We have to finish by Friday.",
+        burmese: "သောကြာနေ့အပြီး လုပ်ရမယ်။",
+        usage: "Rule or deadline",
+      },
+      {
+        pattern: "don't have to vs mustn't",
+        english: "don't have to (optional) ≠ mustn't (forbidden)",
+        burmese: "မလုပ်လည်းရ ≠ လုံးဝမလုပ်ရ",
+        usage: "Key negative difference",
+      },
+    ],
+    relatedTipIds: ["tip-verb-be", "tip-connectors"],
     practiceCategoryId: "cat-work",
   },
   {
@@ -554,6 +838,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Keep 'will' out of the 'if' clause — put 'will' only in the result clause.",
     },
+    cheatSheet: [
+      {
+        pattern: "1st: If + V1, will + V1",
+        english: "If it rains, we will stay home.",
+        burmese: "မိုးရွာရင် အိမ်ထဲနေမယ်။",
+        usage: "Real future possibility",
+      },
+      {
+        pattern: "2nd: If + V2, would + V1",
+        english: "If I had time, I would travel.",
+        burmese: "အချိန်ရှိရင် ခရီးထွက်ဖြစ်မယ်။",
+        usage: "Imaginary / unlikely now",
+      },
+      {
+        pattern: "Comma rule",
+        english: "If + A, B.  |  B if + A. (no comma)",
+        burmese: "If ရှေ့ကစရင် ကော်မာထည့်",
+        usage: "Punctuation shortcut",
+      },
+    ],
+    relatedTipIds: ["tip-svo", "tip-checklist"],
     practiceCategoryId: "cat-grammar",
   },
   {
@@ -602,6 +907,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Modal verbs (can, could, will, would, should, must) connect directly to V1 without 'to'.",
     },
+    cheatSheet: [
+      {
+        pattern: "Could you please + V1?",
+        english: "Could you please review this file?",
+        burmese: "ဒီဖိုင်ကို စစ်ဆေးပေးနိုင်မလား။",
+        usage: "Polite work request",
+      },
+      {
+        pattern: "Could I / May I + V1?",
+        english: "May I see the menu, please?",
+        burmese: "ဟင်းလျာစာရင်း ကြည့်လို့ရမလား။",
+        usage: "Asking permission / dining",
+      },
+      {
+        pattern: "I would like + noun / to V1",
+        english: "I would like an iced coffee.",
+        burmese: "ကော်ဖီအေးတစ်ခွက် လိုချင်ပါတယ်။",
+        usage: "Polite alternative to 'I want'",
+      },
+    ],
+    relatedTipIds: ["tip-articles", "tip-checklist"],
     practiceCategoryId: "cat-food",
   },
   {
@@ -650,6 +976,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Include the 'be' verb ('was / were') before V3 so the flight isn't the doer of the delay.",
     },
+    cheatSheet: [
+      {
+        pattern: "Present Passive (is / are + V3)",
+        english: "English is spoken worldwide.",
+        burmese: "အင်္ဂလိပ်စာကို ကမ္ဘာအနှံ့ ပြောကြတယ်။",
+        usage: "General facts / processes",
+      },
+      {
+        pattern: "Past Passive (was / were + V3)",
+        english: "My flight was delayed.",
+        burmese: "လေယာဉ်ခရီးစဉ် နောက်ကျသွားတယ်။",
+        usage: "Completed past events",
+      },
+      {
+        pattern: "Future Passive (will be + V3)",
+        english: "The report will be sent today.",
+        burmese: "အစီရင်ခံစာကို ဒီနေ့ ပို့ပေးမယ်။",
+        usage: "Scheduled future action",
+      },
+    ],
+    relatedTipIds: ["tip-connectors", "tip-verb-be"],
     practiceCategoryId: "cat-travel",
   },
   {
@@ -705,6 +1052,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       correct: "I enjoy reading English stories.",
       reason: "'Enjoy' always takes a gerund (-ing), never 'to + verb'.",
     },
+    cheatSheet: [
+      {
+        pattern: "Verb + V-ing",
+        english: "enjoy, finish, practice, avoid, suggest",
+        burmese: "V-ing လိုက်ရသော ကြိယာများ",
+        usage: "e.g., practice writing",
+      },
+      {
+        pattern: "Verb + to + V1",
+        english: "want, plan, need, decide, hope, learn",
+        burmese: "to + V1 လိုက်ရသော ကြိယာများ",
+        usage: "e.g., plan to go",
+      },
+      {
+        pattern: "Preposition + V-ing",
+        english: "Thank you for helping / Sorry for replying late",
+        burmese: "ဝိဘတ်နောက် V-ing အမြဲသုံး",
+        usage: "Never 'for to help'",
+      },
+    ],
+    relatedTipIds: ["tip-svo", "tip-used-to-vs-be-used-to"],
     practiceCategoryId: "cat-opinions",
   },
   {
@@ -759,132 +1127,27 @@ export const TENSE_LESSONS: TenseLesson[] = [
       reason:
         "Never use 'more' and '-er' together. Use 'much' to intensify ('much easier').",
     },
+    cheatSheet: [
+      {
+        pattern: "Short adjective (-er / the -est)",
+        english: "near → nearer → the nearest",
+        burmese: "စာလုံးတို -er / the -est",
+        usage: "1-syllable & -y words",
+      },
+      {
+        pattern: "Long adjective (more / the most)",
+        english: "confident → more confident → the most confident",
+        burmese: "စာလုံးရှည် more / the most",
+        usage: "2+ syllable adjectives",
+      },
+      {
+        pattern: "Irregular forms",
+        english: "good → better → best  |  bad → worse → worst",
+        burmese: "ပုံသဏ္ဌာန်ပြောင်း နာမဝိသေသန",
+        usage: "No -er or more",
+      },
+    ],
+    relatedTipIds: ["tip-articles", "tip-checklist"],
     practiceCategoryId: "cat-opinions",
-  },
-];
-
-export const TENSE_COMPARISON_ROWS: TenseComparisonRow[] = [
-  {
-    tenseId: "present-simple",
-    tenseName: "Present Simple",
-    burmeseLabel: "နေ့စဉ်အလေ့အကျင့်",
-    englishSentence: "I write English every day.",
-    burmeseMeaning: "ကျွန်တော် နေ့တိုင်း အင်္ဂလိပ်စာ ရေးတယ်။",
-    focus: "Routine / habit",
-  },
-  {
-    tenseId: "present-continuous",
-    tenseName: "Present Continuous",
-    burmeseLabel: "အခုလုပ်နေဆဲ",
-    englishSentence: "I am writing English right now.",
-    burmeseMeaning: "ကျွန်တော် အခု အင်္ဂလိပ်စာ ရေးနေတယ်။",
-    focus: "Happening right now",
-  },
-  {
-    tenseId: "present-perfect",
-    tenseName: "Present Perfect",
-    burmeseLabel: "အတိတ်မှ ယခုထိ",
-    englishSentence: "I have written English for two years.",
-    burmeseMeaning: "ကျွန်တော် အင်္ဂလိပ်စာ ရေးလာတာ နှစ်နှစ် ရှိပြီ။",
-    focus: "Duration / result now",
-  },
-  {
-    tenseId: "past-simple",
-    tenseName: "Past Simple",
-    burmeseLabel: "ပြီးဆုံးခဲ့သောအတိတ်",
-    englishSentence: "I wrote an English essay yesterday.",
-    burmeseMeaning: "မနေ့က ကျွန်တော် အင်္ဂလိပ်စာစီစာကုံးတစ်ပုဒ် ရေးခဲ့တယ်။",
-    focus: "Finished past event",
-  },
-  {
-    tenseId: "used-to",
-    tenseName: "used to",
-    burmeseLabel: "အရင်က လုပ်လေ့ရှိခဲ့",
-    englishSentence: "I used to write in a paper notebook.",
-    burmeseMeaning: "ကျွန်တော် အရင်က စာအုပ်ထဲမှာ ရေးလေ့ရှိခဲ့တယ်။",
-    focus: "Stopped past habit",
-  },
-  {
-    tenseId: "be-going-to",
-    tenseName: "be going to",
-    burmeseLabel: "စီစဉ်ထားသောအနာဂတ်",
-    englishSentence: "I am going to write five sentences tonight.",
-    burmeseMeaning: "ဒီည ဝါကျငါးကြောင်း ရေးဖို့ စီစဉ်ထားတယ်။",
-    focus: "Planned intention",
-  },
-];
-
-export const WRITING_TIPS: WritingTip[] = [
-  {
-    id: "tip-svo",
-    tag: "structure",
-    title: "Flip Burmese SOV into English SVO",
-    burmeseTitle: "ဝါကျတည်ဆောက်ပုံ ပြောင်းလဲခြင်း",
-    summary:
-      "Burmese places the verb at the end (Subject + Object + Verb), while English puts the verb immediately after the subject.",
-    trick:
-      "Before typing, find WHO (Subject) and ACTION (Verb) first — lock them in spots #1 and #2, then add details (what, where, when).",
-    before: "I + every day + English + practice.",
-    after: "I + practice + English + every day.",
-  },
-  {
-    id: "tip-prepositions",
-    tag: "grammar",
-    title: "The AT → ON → IN Time Triangle",
-    burmeseTitle: "အချိန်ပြဝိဘတ်များ (at / on / in)",
-    summary:
-      "Move from exact to broad: AT (8 PM), ON (Monday, May 5), IN (July, 2026, the morning).",
-    trick:
-      "Skip the preposition completely before 'today', 'tomorrow', 'yesterday', 'this afternoon', and 'next Monday'.",
-    before: "We have a meeting in this afternoon on 3 PM.",
-    after: "We have a meeting this afternoon at 3 PM.",
-  },
-  {
-    id: "tip-articles",
-    tag: "grammar",
-    title: "Quick Rule for a, an, and the",
-    burmeseTitle: "Article အသုံးပြုနည်း",
-    summary:
-      "Because Burmese doesn't use articles, it is easy to leave them out before singular countable nouns.",
-    trick:
-      "Use 'a/an' when introducing any one item for the first time ('a report'). Switch to 'the' when both reader and writer know which specific one ('the report').",
-    before: "I will send report before deadline.",
-    after: "I will send the report before the deadline.",
-  },
-  {
-    id: "tip-verb-be",
-    tag: "grammar",
-    title: "Don't Double am/is/are with Action Verbs",
-    burmeseTitle: "Verb to be နှင့် ကြိယာ တွဲသုံးမှုသတိထားရန်",
-    summary:
-      "Words like 'agree', 'understand', and 'need' are already verbs — they do not need 'am / is / are' in front.",
-    trick:
-      "Only pair 'am/is/are' with adjectives ('am confident'), nouns ('am a student'), or -ing/passive verbs ('am writing', 'was delayed').",
-    before: "I am agree with your idea.",
-    after: "I agree with your idea.",
-  },
-  {
-    id: "tip-connectors",
-    tag: "vocabulary",
-    title: "because vs because of",
-    burmeseTitle: "အကြောင်းပြချက် ချိတ်ဆက်စကားလုံးများ",
-    summary:
-      "Connecting ideas cleanly makes your English sound fluent and logical.",
-    trick:
-      "Follow 'because' with a full clause (subject + verb). Follow 'because of' or 'due to' with just a noun phrase.",
-    before: "My flight was delayed because the bad weather.",
-    after: "My flight was delayed because of the bad weather.",
-  },
-  {
-    id: "tip-checklist",
-    tag: "polish",
-    title: "The 5-Second Writing Check",
-    burmeseTitle: "မတင်ခင် ၅ စက္ကန့် ပြန်စစ်နည်း",
-    summary:
-      "Catch 80% of writing slips before hitting Enter with three rapid checks.",
-    trick:
-      "1) Does the time word match the verb tense? 2) Does 'he/she/it' have '-s'? 3) Did you capitalize 'I' and finish with '.' or '?'?",
-    before: "yesterday i go to station and buy ticket",
-    after: "Yesterday, I went to the station and bought a ticket.",
   },
 ];
