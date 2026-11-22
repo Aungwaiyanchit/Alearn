@@ -1,9 +1,14 @@
 "use client";
 
-import { BookCheck, Dices, PenLine, Target } from "lucide-react";
+import { BookCheck, Dices, PenLine, ShieldCheck, Target } from "lucide-react";
+import Link from "next/link";
 import { usePracticeStore } from "@/store/use-practice-store";
 
-export function AppHeader() {
+interface AppHeaderProps {
+  showLocalAdmin?: boolean;
+}
+
+export function AppHeader({ showLocalAdmin = false }: AppHeaderProps) {
   const stats = usePracticeStore((state) => state.stats);
   const openRandomModal = usePracticeStore((state) => state.openRandomModal);
 
@@ -56,6 +61,17 @@ export function AppHeader() {
             <Dices className="h-3.5 w-3.5" />
             <span>New Random Set</span>
           </button>
+
+          {showLocalAdmin && (
+            <Link
+              href="/admin"
+              title="Local-only Admin panel"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-stone-700 shadow-xs transition hover:border-stone-400 hover:bg-stone-50"
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="hidden sm:inline">Admin</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

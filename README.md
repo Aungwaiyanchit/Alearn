@@ -10,6 +10,7 @@ A Next.js web application for practicing English writing skills from Burmese (`á
 - **Random Categories**:
   - **Instant Random Mix**: Quickly shuffle 8 prompts across all categories.
   - **Make Random Category**: Build and save custom random practice categories (choose name, question count, and difficulty pool) directly into SQLite.
+- **Local-Only Admin Panel (`/admin`)**: Available exclusively when running locally on `localhost` / `127.0.0.1` (hard-blocked with `404` on Vercel and remote hosts) to create, edit, and delete categories and questions or reset local practice attempts.
 
 ## Tech Stack
 
