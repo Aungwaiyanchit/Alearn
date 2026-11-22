@@ -1,17 +1,45 @@
-import { describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { rmSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import {
   bulkInsertQuestionsFromCsv,
   createCategory,
   createQuestion,
   deleteCategoryById,
   deleteQuestionById,
+  destroyAllData,
   listAllQuestions,
   updateCategory,
   updateQuestion,
 } from "@/db/admin-repository";
+import { closeDb } from "@/db/client";
 import { getQuestionsForCategory, listCategories } from "@/db/repository";
 
 describe("admin sqlite repository", () => {
+  const originalDbPath = process.env.DATABASE_PATH;
+  const tempDbPath = path.join(
+    os.tmpdir(),
+    `alearn-admin-test-${Date.now()}.sqlite`,
+  );
+
+  beforeAll(() => {
+    closeDb();
+    process.env.DATABASE_PATH = tempDbPath;
+  });
+
+  afterAll(() => {
+    closeDb();
+    if (originalDbPath === undefined) {
+      delete process.env.DATABASE_PATH;
+    } else {
+      process.env.DATABASE_PATH = originalDbPath;
+    }
+    rmSync(tempDbPath, { force: true });
+    rmSync(`${tempDbPath}-wal`, { force: true });
+    rmSync(`${tempDbPath}-shm`, { force: true });
+  });
+
   test("creates, updates, and deletes a category and its questions", () => {
     const category = createCategory({
       name: "Admin Test Category",
@@ -106,5 +134,15 @@ describe("admin sqlite repository", () => {
     if (createdCategory) {
       expect(deleteCategoryById(createdCategory.id)).toBe(true);
     }
+  });
+
+  test("destroys all data cleanly and stays empty across reconnect", () => {
+    const summary = destroyAllData();
+    expect(summary.deletedCategories).toBeGreaterThan(0);
+    expect(summary.deletedQuestions).toBeGreaterThan(0);
+
+    closeDb();
+    expect(listCategories().length).toBe(0);
+    expect(listAllQuestions().length).toBe(0);
   });
 });

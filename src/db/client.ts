@@ -155,3 +155,10 @@ export function getDb(): Database {
   globalForDb.alearnDb = db;
   return db;
 }
+
+export function closeDb(): void {
+  if (globalForDb.alearnDb) {
+    globalForDb.alearnDb.close();
+    globalForDb.alearnDb = undefined;
+  }
+}

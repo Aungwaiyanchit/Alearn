@@ -1,4 +1,8 @@
-import { describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { rmSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { closeDb } from "@/db/client";
 import {
   createRandomCategory,
   deleteRandomCategory,
@@ -7,6 +11,29 @@ import {
 } from "@/db/repository";
 
 describe("sqlite repository", () => {
+  const originalDbPath = process.env.DATABASE_PATH;
+  const tempDbPath = path.join(
+    os.tmpdir(),
+    `alearn-repo-test-${Date.now()}.sqlite`,
+  );
+
+  beforeAll(() => {
+    closeDb();
+    process.env.DATABASE_PATH = tempDbPath;
+  });
+
+  afterAll(() => {
+    closeDb();
+    if (originalDbPath === undefined) {
+      delete process.env.DATABASE_PATH;
+    } else {
+      process.env.DATABASE_PATH = originalDbPath;
+    }
+    rmSync(tempDbPath, { force: true });
+    rmSync(`${tempDbPath}-wal`, { force: true });
+    rmSync(`${tempDbPath}-shm`, { force: true });
+  });
+
   test("seeds default Burmese-to-English categories and questions", () => {
     const categories = listCategories();
     expect(categories.length).toBeGreaterThanOrEqual(6);
