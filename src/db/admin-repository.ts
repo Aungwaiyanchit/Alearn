@@ -1,11 +1,32 @@
 import { randomUUID } from "node:crypto";
 import { getDb } from "@/db/client";
 import { listCategories } from "@/db/repository";
+import type { BulkCsvQuestionRow } from "@/lib/csv-questions";
 import type {
   CategoryMutationInput,
   QuestionMutationInput,
 } from "@/types/admin";
 import type { Category, Difficulty, LessonQuestion } from "@/types/practice";
+
+const IMPORT_ACCENT_COLORS = [
+  "amber",
+  "indigo",
+  "emerald",
+  "rose",
+  "sky",
+  "violet",
+] as const;
+
+export interface BulkImportSummary {
+  insertedQuestions: number;
+  createdCategories: number;
+}
+
+export interface DestroyAllSummary {
+  deletedCategories: number;
+  deletedQuestions: number;
+  deletedAttempts: number;
+}
 
 interface QuestionRow {
   id: string;
@@ -261,4 +282,158 @@ export function resetAllAttempts(): number {
   const db = getDb();
   const result = db.prepare("DELETE FROM attempts").run();
   return result.changes;
+}
+
+function formatCategoryDisplayName(rawCategory: string): string {
+  const trimmed = rawCategory.trim();
+  if (!trimmed.includes("-") || trimmed.includes(" ")) {
+    return trimmed;
+  }
+
+  return trimmed
+    .split("-")
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+export function bulkInsertQuestionsFromCsv(
+  rows: BulkCsvQuestionRow[],
+): BulkImportSummary {
+  const db = getDb();
+  const existingCategories = db
+    .query<{ id: string; slug: string; name: string }, []>(
+      "SELECT id, slug, name FROM categories WHERE is_random = 0",
+    )
+    .all();
+
+  const categoryLookup = new Map<string, string>();
+  for (const cat of existingCategories) {
+    categoryLookup.set(cat.id.toLowerCase(), cat.id);
+    categoryLookup.set(cat.slug.toLowerCase(), cat.id);
+    categoryLookup.set(cat.name.toLowerCase(), cat.id);
+  }
+
+  const insertCategoryStmt = db.prepare(`
+    INSERT INTO categories (id, slug, name, burmese_name, description, icon, accent_color, is_random)
+    VALUES (?, ?, ?, ?, ?, 'book-open', ?, 0)
+  `);
+
+  const insertQuestionStmt = db.prepare(`
+    INSERT INTO questions (
+      id,
+      category_id,
+      burmese_prompt,
+      english_answer,
+      accepted_answers,
+      hint,
+      grammar_note,
+      difficulty
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const insertLinkStmt = db.prepare(`
+    INSERT OR IGNORE INTO category_questions (category_id, question_id, position)
+    VALUES (?, ?, ?)
+  `);
+
+  const nextPositionByCategory = new Map<string, number>();
+  let createdCategories = 0;
+  let insertedQuestions = 0;
+
+  const getNextPosition = (categoryId: string): number => {
+    const cached = nextPositionByCategory.get(categoryId);
+    if (cached !== undefined) {
+      nextPositionByCategory.set(categoryId, cached + 1);
+      return cached;
+    }
+
+    const row = db
+      .query<{ next_pos: number }, [string]>(
+        "SELECT COALESCE(MAX(position) + 1, 0) AS next_pos FROM category_questions WHERE category_id = ?",
+      )
+      .get(categoryId);
+    const startPos = row?.next_pos ?? 0;
+    nextPositionByCategory.set(categoryId, startPos + 1);
+    return startPos;
+  };
+
+  const tx = db.transaction(() => {
+    for (const row of rows) {
+      const normalizedKey = row.category.trim().toLowerCase();
+      let categoryId = categoryLookup.get(normalizedKey);
+
+      if (!categoryId) {
+        const displayName = formatCategoryDisplayName(row.category);
+        const newId = `cat-${randomUUID().slice(0, 8)}`;
+        const slug = buildSlug(displayName, newId.slice(-4));
+        const color =
+          IMPORT_ACCENT_COLORS[
+            (existingCategories.length + createdCategories) %
+              IMPORT_ACCENT_COLORS.length
+          ];
+
+        insertCategoryStmt.run(
+          newId,
+          slug,
+          displayName,
+          row.categoryBurmese || displayName,
+          "Imported writing practice lessons.",
+          color,
+        );
+
+        categoryId = newId;
+        createdCategories += 1;
+        categoryLookup.set(normalizedKey, newId);
+        categoryLookup.set(displayName.toLowerCase(), newId);
+        categoryLookup.set(slug.toLowerCase(), newId);
+      }
+
+      const questionId = `q-${randomUUID().slice(0, 8)}`;
+      insertQuestionStmt.run(
+        questionId,
+        categoryId,
+        row.burmesePrompt,
+        row.englishAnswer,
+        JSON.stringify(row.acceptedAnswers),
+        row.hint,
+        row.grammarNote,
+        row.difficulty,
+      );
+
+      insertLinkStmt.run(categoryId, questionId, getNextPosition(categoryId));
+      insertedQuestions += 1;
+    }
+  });
+
+  tx();
+
+  return { insertedQuestions, createdCategories };
+}
+
+export function destroyAllData(): DestroyAllSummary {
+  const db = getDb();
+
+  let deletedCategories = 0;
+  let deletedQuestions = 0;
+  let deletedAttempts = 0;
+
+  const tx = db.transaction(() => {
+    deletedAttempts = db.prepare("DELETE FROM attempts").run().changes;
+    db.prepare("DELETE FROM category_questions").run();
+    deletedQuestions = db.prepare("DELETE FROM questions").run().changes;
+    deletedCategories = db.prepare("DELETE FROM categories").run().changes;
+    db.prepare(
+      "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('initialized', '1')",
+    ).run();
+  });
+
+  tx();
+
+  return {
+    deletedCategories,
+    deletedQuestions,
+    deletedAttempts,
+  };
 }

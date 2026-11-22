@@ -46,6 +46,11 @@ function initializeSchema(db: Database): void {
       FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS app_meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS attempts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       question_id TEXT NOT NULL,
@@ -59,11 +64,24 @@ function initializeSchema(db: Database): void {
 }
 
 function seedDatabaseIfEmpty(db: Database): void {
+  const initialized = db
+    .query<{ value: string }, []>(
+      "SELECT value FROM app_meta WHERE key = 'initialized'",
+    )
+    .get();
+
+  if (initialized?.value === "1") {
+    return;
+  }
+
   const row = db
     .query<{ count: number }, []>("SELECT COUNT(*) as count FROM categories")
     .get();
 
   if (row && row.count > 0) {
+    db.prepare(
+      "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('initialized', '1')",
+    ).run();
     return;
   }
 
@@ -113,6 +131,9 @@ function seedDatabaseIfEmpty(db: Database): void {
       insertLink.run(question.categoryId, question.id, pos);
       positionByCategory.set(question.categoryId, pos + 1);
     }
+    db.prepare(
+      "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('initialized', '1')",
+    ).run();
   });
 
   runSeed();
