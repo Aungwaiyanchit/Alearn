@@ -1,6 +1,14 @@
 "use client";
 
-import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  Download,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/ui/PaginationControls";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
@@ -41,6 +49,9 @@ export function QuestionManager() {
   );
   const openCreateQuestionModal = useAdminStore(
     (state) => state.openCreateQuestionModal,
+  );
+  const openBulkImportModal = useAdminStore(
+    (state) => state.openBulkImportModal,
   );
   const openEditQuestionModal = useAdminStore(
     (state) => state.openEditQuestionModal,
@@ -118,15 +129,35 @@ export function QuestionManager() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={openCreateQuestionModal}
-          disabled={regularCategories.length === 0}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-stone-800 disabled:opacity-50"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          <span>New Question</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/api/admin/questions/template"
+            download="alearn-questions-template.csv"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-700 shadow-xs transition hover:border-stone-300 hover:bg-stone-50"
+          >
+            <Download className="h-3.5 w-3.5 text-amber-600" />
+            <span>CSV Template</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={openBulkImportModal}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2 text-xs font-semibold text-amber-950 shadow-xs transition hover:bg-amber-100"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            <span>Bulk Import CSV</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={openCreateQuestionModal}
+            disabled={regularCategories.length === 0}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-stone-800 disabled:opacity-50"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>New Question</span>
+          </button>
+        </div>
       </div>
 
       {/* Search & Filter Toolbar */}

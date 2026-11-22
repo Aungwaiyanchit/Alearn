@@ -41,6 +41,8 @@ interface AdminState {
   editingCategory: Category | null;
   isQuestionModalOpen: boolean;
   editingQuestion: LessonQuestion | null;
+  isBulkImportModalOpen: boolean;
+  isDestroyModalOpen: boolean;
 
   hydrateInitial: (params: {
     categories: Category[];
@@ -66,11 +68,18 @@ interface AdminState {
   openEditQuestionModal: (question: LessonQuestion) => void;
   closeQuestionModal: () => void;
 
+  openBulkImportModal: () => void;
+  closeBulkImportModal: () => void;
+  openDestroyModal: () => void;
+  closeDestroyModal: () => void;
+
   saveCategory: (input: CategoryMutationInput) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   saveQuestion: (input: QuestionMutationInput) => Promise<void>;
   deleteQuestion: (id: string) => Promise<void>;
+  bulkImportCsv: (csvText: string) => Promise<boolean>;
   resetProgress: () => Promise<void>;
+  destroyEverything: (confirmation: string) => Promise<boolean>;
 }
 
 const DEFAULT_STATS: PracticeStats = {
@@ -101,6 +110,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   editingCategory: null,
   isQuestionModalOpen: false,
   editingQuestion: null,
+  isBulkImportModalOpen: false,
+  isDestroyModalOpen: false,
 
   hydrateInitial: ({ categories, questions, stats, databasePath }) => {
     set({ categories, questions, stats, databasePath });
@@ -133,6 +144,11 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ isQuestionModalOpen: true, editingQuestion: question }),
   closeQuestionModal: () =>
     set({ isQuestionModalOpen: false, editingQuestion: null }),
+
+  openBulkImportModal: () => set({ isBulkImportModalOpen: true }),
+  closeBulkImportModal: () => set({ isBulkImportModalOpen: false }),
+  openDestroyModal: () => set({ isDestroyModalOpen: true }),
+  closeDestroyModal: () => set({ isDestroyModalOpen: false }),
 
   saveCategory: async (input) => {
     const editing = get().editingCategory;
@@ -370,6 +386,124 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             error instanceof Error ? error.message : "Failed to reset progress",
         },
       });
+    }
+  },
+
+  bulkImportCsv: async (csvText) => {
+    set({ isSaving: true });
+    try {
+      const response = await fetch("/api/admin/questions/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csvText }),
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        summary?: { insertedQuestions: number; createdCategories: number };
+        categories?: Category[];
+        questions?: LessonQuestion[];
+        stats?: PracticeStats;
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Bulk CSV import failed");
+      }
+
+      const inserted = payload.summary?.insertedQuestions ?? 0;
+      const createdCats = payload.summary?.createdCategories ?? 0;
+      const categorySuffix =
+        createdCats > 0
+          ? ` and created ${createdCats} new ${createdCats === 1 ? "category" : "categories"}`
+          : "";
+
+      set((state) => ({
+        categories: payload.categories ?? state.categories,
+        questions: payload.questions ?? state.questions,
+        stats: payload.stats ?? state.stats,
+        questionPage: 1,
+        isSaving: false,
+        isBulkImportModalOpen: false,
+        notice: {
+          id: Date.now(),
+          type: "success",
+          message: `Imported ${inserted} ${inserted === 1 ? "question" : "questions"}${categorySuffix}`,
+        },
+      }));
+
+      return true;
+    } catch (error) {
+      set({
+        isSaving: false,
+        notice: {
+          id: Date.now(),
+          type: "error",
+          message:
+            error instanceof Error ? error.message : "Bulk CSV import failed",
+        },
+      });
+      return false;
+    }
+  },
+
+  destroyEverything: async (confirmation) => {
+    set({ isSaving: true });
+    try {
+      const response = await fetch("/api/admin/destroy", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation }),
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        deleted?: {
+          deletedCategories: number;
+          deletedQuestions: number;
+          deletedAttempts: number;
+        };
+        categories?: Category[];
+        questions?: LessonQuestion[];
+        stats?: PracticeStats;
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Failed to destroy data");
+      }
+
+      const deleted = payload.deleted;
+      set({
+        categories: payload.categories ?? [],
+        questions: payload.questions ?? [],
+        stats: payload.stats ?? DEFAULT_STATS,
+        filterCategoryId: "all",
+        filterDifficulty: "all",
+        searchQuery: "",
+        questionPage: 1,
+        categoryPage: 1,
+        isSaving: false,
+        isDestroyModalOpen: false,
+        notice: {
+          id: Date.now(),
+          type: "success",
+          message: deleted
+            ? `Destroyed ${deleted.deletedCategories} categories, ${deleted.deletedQuestions} questions, and ${deleted.deletedAttempts} attempts`
+            : "Destroyed all local database records",
+        },
+      });
+
+      return true;
+    } catch (error) {
+      set({
+        isSaving: false,
+        notice: {
+          id: Date.now(),
+          type: "error",
+          message:
+            error instanceof Error ? error.message : "Failed to destroy data",
+        },
+      });
+      return false;
     }
   },
 }));

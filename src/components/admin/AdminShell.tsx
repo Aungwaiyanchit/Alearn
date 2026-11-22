@@ -5,8 +5,10 @@ import { BookOpen, CheckCircle2, FolderKanban, X, XCircle } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminStatsBar } from "@/components/admin/AdminStatsBar";
+import { BulkCsvImportModal } from "@/components/admin/BulkCsvImportModal";
 import { CategoryFormModal } from "@/components/admin/CategoryFormModal";
 import { CategoryManager } from "@/components/admin/CategoryManager";
+import { DestroyAllModal } from "@/components/admin/DestroyAllModal";
 import { QuestionFormModal } from "@/components/admin/QuestionFormModal";
 import { QuestionManager } from "@/components/admin/QuestionManager";
 import { useAdminStore } from "@/store/use-admin-store";
@@ -135,6 +137,8 @@ export function AdminShell({
 
       <CategoryFormModal />
       <QuestionFormModal />
+      <BulkCsvImportModal />
+      <DestroyAllModal />
     </div>
   );
 }
