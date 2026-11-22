@@ -1,0 +1,35 @@
+{
+  "name": "alearn",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun --bun next dev --webpack",
+    "build": "bun --bun next build --webpack",
+    "start": "bun --bun next start",
+    "test": "bun test",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "format": "biome format --write",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "framer-motion": "latest",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "zustand": "latest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "latest",
+    "@commitlint/cli": "latest",
+    "@commitlint/config-conventional": "latest",
+    "@tailwindcss/postcss": "latest",
+    "@types/bun": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
+  }
+}
