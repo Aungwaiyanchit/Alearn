@@ -42,7 +42,7 @@ export function SessionSummary({
       initial={{ opacity: 0, y: 18, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 240, damping: 22 }}
-      className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8"
+      className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-8"
     >
       <div className="flex flex-col items-center text-center">
         <motion.div
@@ -120,7 +120,7 @@ export function SessionSummary({
           <button
             type="button"
             onClick={onRandomMix}
-            className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-amber-600"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-blue-700"
           >
             <Shuffle className="h-4 w-4" />
             <span>Try Random Mix</span>

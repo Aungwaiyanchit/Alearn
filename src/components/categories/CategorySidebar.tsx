@@ -47,13 +47,13 @@ export function CategorySidebar() {
 
   return (
     <aside className="flex flex-col gap-5">
-      {/* Instant Random Mix + Make Random Category Controls */}
-      <div className="rounded-2xl border border-stone-200/90 bg-white p-3.5 shadow-xs">
+      {/* Quick Random Modes */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
         <div className="mb-2.5 flex items-center justify-between">
-          <span className="text-xs font-semibold tracking-wide text-stone-500 uppercase">
+          <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
             Random Practice
           </span>
-          <span className="font-myanmar text-[11px] text-stone-400">
+          <span className="font-myanmar text-[11px] text-slate-400">
             ကျပန်းလေ့ကျင့်ရန်
           </span>
         </div>
@@ -61,50 +61,44 @@ export function CategorySidebar() {
         <div className="flex flex-col gap-2">
           <motion.button
             type="button"
-            whileHover={{ y: -1 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => selectCategory("random-mix", { count: 8 })}
-            className={`flex w-full items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left transition ${
+            className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
               isRandomMixActive
-                ? "border-amber-400 bg-amber-50 text-amber-950 ring-2 ring-amber-400/30"
-                : "border-stone-200 bg-stone-50/70 text-stone-800 hover:border-amber-300 hover:bg-amber-50/50"
+                ? "border-blue-300 bg-blue-50/70 text-blue-950 ring-1 ring-blue-500/20"
+                : "border-slate-200 bg-slate-50/70 text-slate-800 hover:border-slate-300 hover:bg-slate-100/70"
             }`}
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white shadow-xs">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white">
               <Shuffle className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold">Instant Random Mix</div>
-              <div className="font-myanmar text-[11px] text-stone-500">
+              <div className="text-xs font-semibold">Instant Random Mix</div>
+              <div className="font-myanmar text-[11px] text-slate-500">
                 ကဏ္ဍစုံမှ ကျပန်း ၈ ပုဒ်
               </div>
             </div>
           </motion.button>
 
-          <motion.button
+          <button
             type="button"
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.98 }}
             onClick={openRandomModal}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-stone-900 px-3.5 py-2.5 text-xs font-semibold text-white transition hover:bg-stone-800"
+            className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5 text-blue-600" />
             <span>Make Random Category</span>
-            <Dices className="h-3.5 w-3.5 text-amber-400" />
-          </motion.button>
+            <Dices className="h-3.5 w-3.5 text-slate-400" />
+          </button>
         </div>
       </div>
 
       {/* Custom Saved Random Categories */}
       {randomCategories.length > 0 && (
         <section>
-          <div className="mb-2.5 flex items-center justify-between px-1">
-            <h2 className="text-xs font-semibold tracking-wide text-stone-500 uppercase">
+          <div className="mb-2 flex items-center justify-between px-1">
+            <h2 className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
               Your Random Sets ({randomCategories.length})
             </h2>
-            <span className="font-myanmar text-[11px] text-stone-400">
-              သိမ်းထားသော ကျပန်းကဏ္ဍများ
-            </span>
           </div>
           <div className="flex flex-col gap-2">
             {randomPagination.items.map((category) => (
@@ -132,11 +126,11 @@ export function CategorySidebar() {
 
       {/* Core Practice Categories */}
       <section>
-        <div className="mb-2.5 flex items-center justify-between px-1">
-          <h2 className="text-xs font-semibold tracking-wide text-stone-500 uppercase">
-            Practice Categories ({builtInCategories.length})
+        <div className="mb-2 flex items-center justify-between px-1">
+          <h2 className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+            Categories ({builtInCategories.length})
           </h2>
-          <span className="font-myanmar text-[11px] text-stone-400">
+          <span className="font-myanmar text-[11px] text-slate-400">
             သင်ခန်းစာ ကဏ္ဍများ
           </span>
         </div>

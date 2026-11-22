@@ -45,14 +45,14 @@ export function PracticeAppShell({
   ]);
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] text-stone-900">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
       <AppHeader
         showLocalAdmin={showLocalAdmin}
         initialStats={initialStats}
         showRandomModalTrigger
       />
 
-      <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:py-8">
+      <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-7 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:py-9">
         <div className="order-2 lg:order-1 lg:col-span-4">
           <CategorySidebar />
         </div>

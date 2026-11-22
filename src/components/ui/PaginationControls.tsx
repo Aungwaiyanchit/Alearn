@@ -44,7 +44,7 @@ export function PaginationControls({
         aria-label={`${itemLabel} pagination`}
         className="mt-2 flex items-center justify-between gap-2 px-1"
       >
-        <span className="text-[11px] font-medium tabular-nums text-stone-400">
+        <span className="text-[11px] font-medium tabular-nums text-slate-400">
           Page {currentPage} of {totalPages}
         </span>
         <div className="flex items-center gap-1">
@@ -53,7 +53,7 @@ export function PaginationControls({
             disabled={currentPage <= 1}
             onClick={() => onPageChange(currentPage - 1)}
             aria-label="Previous page"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
           </button>
@@ -62,7 +62,7 @@ export function PaginationControls({
             disabled={currentPage >= totalPages}
             onClick={() => onPageChange(currentPage + 1)}
             aria-label="Next page"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-600 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
@@ -76,28 +76,28 @@ export function PaginationControls({
   return (
     <nav
       aria-label={`${itemLabel} pagination`}
-      className="flex flex-col gap-3 rounded-2xl border border-stone-200/90 bg-white px-4 py-3 shadow-xs sm:flex-row sm:items-center sm:justify-between"
+      className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-xs sm:flex-row sm:items-center sm:justify-between"
     >
-      <div className="flex flex-wrap items-center gap-3 text-xs text-stone-500">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
         <span className="tabular-nums">
           Showing{" "}
-          <strong className="font-semibold text-stone-900">
+          <strong className="font-semibold text-slate-900">
             {startIndex}–{endIndex}
           </strong>{" "}
           of{" "}
-          <strong className="font-semibold text-stone-900">{totalItems}</strong>{" "}
+          <strong className="font-semibold text-slate-900">{totalItems}</strong>{" "}
           {itemLabel}
         </span>
 
         {pageSizeOptions && pageSize && onPageSizeChange && (
-          <label className="inline-flex items-center gap-1.5 text-xs text-stone-500">
+          <label className="inline-flex items-center gap-1.5 text-xs text-slate-500">
             <span>Per page</span>
             <select
               value={pageSize}
               onChange={(event) =>
                 onPageSizeChange(Number.parseInt(event.target.value, 10))
               }
-              className="rounded-lg border border-stone-200 bg-stone-50 px-2 py-1 text-xs font-semibold text-stone-700 outline-none focus:border-amber-500 focus:bg-white"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
             >
               {pageSizeOptions.map((option) => (
                 <option key={option} value={option}>
@@ -115,7 +115,7 @@ export function PaginationControls({
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
           aria-label="Previous page"
-          className="inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Prev</span>
@@ -127,7 +127,7 @@ export function PaginationControls({
               return (
                 <span
                   key={slot}
-                  className="px-1.5 text-xs font-medium text-stone-400"
+                  className="px-1.5 text-xs font-medium text-slate-400"
                 >
                   …
                 </span>
@@ -143,8 +143,8 @@ export function PaginationControls({
                 onClick={() => onPageChange(slot)}
                 className={`h-8 min-w-8 rounded-xl px-2.5 text-xs font-semibold tabular-nums transition ${
                   isActive
-                    ? "bg-stone-900 text-white shadow-xs"
-                    : "border border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+                    ? "bg-blue-600 text-white shadow-xs"
+                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 {slot}
@@ -158,7 +158,7 @@ export function PaginationControls({
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
           aria-label="Next page"
-          className="inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span className="hidden sm:inline">Next</span>
           <ChevronRight className="h-3.5 w-3.5" />

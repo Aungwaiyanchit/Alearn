@@ -33,10 +33,10 @@ export function AnswerFeedback({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8 }}
       transition={{ type: "spring", stiffness: 280, damping: 24 }}
-      className={`rounded-3xl border p-5 shadow-xs sm:p-6 ${
+      className={`rounded-2xl border p-5 shadow-xs sm:p-6 ${
         isCorrect
-          ? "border-emerald-200 bg-emerald-50/60"
-          : "border-rose-200 bg-rose-50/50"
+          ? "border-emerald-200 bg-emerald-50/50"
+          : "border-rose-200 bg-rose-50/40"
       }`}
     >
       {/* Status Banner */}
@@ -187,10 +187,9 @@ export function AnswerFeedback({
         )}
         <motion.button
           type="button"
-          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onNext}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-5 py-2 text-xs font-semibold text-white transition hover:bg-stone-800"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
         >
           <span>{isLastQuestion ? "Finish Session" : "Next Question"}</span>
           <ArrowRight className="h-3.5 w-3.5" />

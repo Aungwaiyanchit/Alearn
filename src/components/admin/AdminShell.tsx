@@ -63,7 +63,7 @@ export function AdminShell({
   }, [notice, clearNotice]);
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] text-stone-900">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
       <AdminHeader />
 
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8">
