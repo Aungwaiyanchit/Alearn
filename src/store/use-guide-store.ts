@@ -2,40 +2,43 @@
 
 import { create } from "zustand";
 import { TENSE_LESSONS } from "@/data/lessons-guide-data";
-import type { TenseTimeGroup, WritingTip } from "@/types/guide";
+import type { LessonTrack, WritingTip } from "@/types/guide";
 
 export type TipFilterTag = "all" | WritingTip["tag"];
 
 interface GuideState {
-  selectedGroup: TenseTimeGroup;
+  selectedTrack: LessonTrack;
+  searchQuery: string;
   selectedLessonId: string;
   selectedTipTag: TipFilterTag;
   lessonPage: number;
 
-  setSelectedGroup: (group: TenseTimeGroup) => void;
+  setSelectedTrack: (track: LessonTrack) => void;
+  setSearchQuery: (query: string) => void;
   selectLesson: (lessonId: string) => void;
   setSelectedTipTag: (tag: TipFilterTag) => void;
   setLessonPage: (page: number) => void;
 }
 
 export const useGuideStore = create<GuideState>((set) => ({
-  selectedGroup: "all",
+  selectedTrack: "all",
+  searchQuery: "",
   selectedLessonId: TENSE_LESSONS[0]?.id ?? "present-simple",
   selectedTipTag: "all",
   lessonPage: 1,
 
-  setSelectedGroup: (selectedGroup) => {
+  setSelectedTrack: (selectedTrack) => {
     const matching =
-      selectedGroup === "all"
+      selectedTrack === "all"
         ? TENSE_LESSONS
-        : TENSE_LESSONS.filter((lesson) => lesson.group === selectedGroup);
+        : TENSE_LESSONS.filter((lesson) => lesson.track === selectedTrack);
 
     set((state) => {
       const stillVisible = matching.some(
         (lesson) => lesson.id === state.selectedLessonId,
       );
       return {
-        selectedGroup,
+        selectedTrack,
         lessonPage: 1,
         selectedLessonId: stillVisible
           ? state.selectedLessonId
@@ -44,6 +47,7 @@ export const useGuideStore = create<GuideState>((set) => ({
     });
   },
 
+  setSearchQuery: (searchQuery) => set({ searchQuery, lessonPage: 1 }),
   selectLesson: (selectedLessonId) => set({ selectedLessonId }),
   setSelectedTipTag: (selectedTipTag) => set({ selectedTipTag }),
   setLessonPage: (lessonPage) => set({ lessonPage }),

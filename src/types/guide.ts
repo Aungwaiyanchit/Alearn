@@ -1,4 +1,4 @@
-export type TenseTimeGroup = "all" | "present" | "past" | "future" | "patterns";
+export type LessonTrack = "all" | "tenses" | "grammar";
 
 export type TimelineVisualType =
   | "habit"
@@ -7,8 +7,9 @@ export type TimelineVisualType =
   | "past-point"
   | "past-ongoing"
   | "future-point"
-  | "conditional"
-  | "modal";
+  | "past-habit"
+  | "planned-future"
+  | "rule-pattern";
 
 export interface TenseFormula {
   positive: string;
@@ -34,7 +35,8 @@ export interface TenseLesson {
   id: string;
   title: string;
   burmeseTitle: string;
-  group: Exclude<TenseTimeGroup, "all">;
+  track: Exclude<LessonTrack, "all">;
+  subgroup: string;
   level: "beginner" | "intermediate" | "advanced";
   summary: string;
   burmeseSummary: string;
