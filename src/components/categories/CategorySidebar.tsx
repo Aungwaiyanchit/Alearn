@@ -2,8 +2,14 @@
 
 import { motion } from "framer-motion";
 import { Dices, Plus, Shuffle } from "lucide-react";
+import { useMemo, useState } from "react";
 import { CategoryCard } from "@/components/categories/CategoryCard";
+import { PaginationControls } from "@/components/ui/PaginationControls";
+import { paginateItems } from "@/lib/pagination";
 import { usePracticeStore } from "@/store/use-practice-store";
+
+const SIDEBAR_CORE_PAGE_SIZE = 5;
+const SIDEBAR_RANDOM_PAGE_SIZE = 4;
 
 export function CategorySidebar() {
   const categories = usePracticeStore((state) => state.categories);
@@ -16,8 +22,27 @@ export function CategorySidebar() {
     (state) => state.deleteRandomCategory,
   );
 
-  const builtInCategories = categories.filter((category) => !category.isRandom);
-  const randomCategories = categories.filter((category) => category.isRandom);
+  const [corePage, setCorePage] = useState(1);
+  const [randomPage, setRandomPage] = useState(1);
+
+  const builtInCategories = useMemo(
+    () => categories.filter((category) => !category.isRandom),
+    [categories],
+  );
+  const randomCategories = useMemo(
+    () => categories.filter((category) => category.isRandom),
+    [categories],
+  );
+
+  const corePagination = useMemo(
+    () => paginateItems(builtInCategories, corePage, SIDEBAR_CORE_PAGE_SIZE),
+    [builtInCategories, corePage],
+  );
+  const randomPagination = useMemo(
+    () => paginateItems(randomCategories, randomPage, SIDEBAR_RANDOM_PAGE_SIZE),
+    [randomCategories, randomPage],
+  );
+
   const isRandomMixActive = selectedCategoryId === "random-mix";
 
   return (
@@ -82,7 +107,7 @@ export function CategorySidebar() {
             </span>
           </div>
           <div className="flex flex-col gap-2">
-            {randomCategories.map((category) => (
+            {randomPagination.items.map((category) => (
               <CategoryCard
                 key={category.id}
                 category={category}
@@ -92,6 +117,16 @@ export function CategorySidebar() {
               />
             ))}
           </div>
+          <PaginationControls
+            compact
+            currentPage={randomPagination.currentPage}
+            totalPages={randomPagination.totalPages}
+            totalItems={randomPagination.totalItems}
+            startIndex={randomPagination.startIndex}
+            endIndex={randomPagination.endIndex}
+            itemLabel="random categories"
+            onPageChange={setRandomPage}
+          />
         </section>
       )}
 
@@ -99,14 +134,14 @@ export function CategorySidebar() {
       <section>
         <div className="mb-2.5 flex items-center justify-between px-1">
           <h2 className="text-xs font-semibold tracking-wide text-stone-500 uppercase">
-            Practice Categories
+            Practice Categories ({builtInCategories.length})
           </h2>
           <span className="font-myanmar text-[11px] text-stone-400">
             သင်ခန်းစာ ကဏ္ဍများ
           </span>
         </div>
         <div className="flex flex-col gap-2">
-          {builtInCategories.map((category) => (
+          {corePagination.items.map((category) => (
             <CategoryCard
               key={category.id}
               category={category}
@@ -115,6 +150,16 @@ export function CategorySidebar() {
             />
           ))}
         </div>
+        <PaginationControls
+          compact
+          currentPage={corePagination.currentPage}
+          totalPages={corePagination.totalPages}
+          totalItems={corePagination.totalItems}
+          startIndex={corePagination.startIndex}
+          endIndex={corePagination.endIndex}
+          itemLabel="practice categories"
+          onPageChange={setCorePage}
+        />
       </section>
     </aside>
   );

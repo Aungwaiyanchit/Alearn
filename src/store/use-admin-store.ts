@@ -29,6 +29,10 @@ interface AdminState {
   searchQuery: string;
   filterCategoryId: string;
   filterDifficulty: Difficulty | "all";
+  questionPage: number;
+  questionPageSize: number;
+  categoryPage: number;
+  categoryPageSize: number;
   isSaving: boolean;
   notice: AdminNotice | null;
 
@@ -48,6 +52,10 @@ interface AdminState {
   setSearchQuery: (query: string) => void;
   setFilterCategoryId: (categoryId: string) => void;
   setFilterDifficulty: (difficulty: Difficulty | "all") => void;
+  setQuestionPage: (page: number) => void;
+  setQuestionPageSize: (pageSize: number) => void;
+  setCategoryPage: (page: number) => void;
+  setCategoryPageSize: (pageSize: number) => void;
   clearNotice: () => void;
 
   openCreateCategoryModal: () => void;
@@ -82,6 +90,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   searchQuery: "",
   filterCategoryId: "all",
   filterDifficulty: "all",
+  questionPage: 1,
+  questionPageSize: 10,
+  categoryPage: 1,
+  categoryPageSize: 6,
   isSaving: false,
   notice: null,
 
@@ -95,9 +107,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   },
 
   setActiveTab: (activeTab) => set({ activeTab }),
-  setSearchQuery: (searchQuery) => set({ searchQuery }),
-  setFilterCategoryId: (filterCategoryId) => set({ filterCategoryId }),
-  setFilterDifficulty: (filterDifficulty) => set({ filterDifficulty }),
+  setSearchQuery: (searchQuery) => set({ searchQuery, questionPage: 1 }),
+  setFilterCategoryId: (filterCategoryId) =>
+    set({ filterCategoryId, questionPage: 1 }),
+  setFilterDifficulty: (filterDifficulty) =>
+    set({ filterDifficulty, questionPage: 1 }),
+  setQuestionPage: (questionPage) => set({ questionPage }),
+  setQuestionPageSize: (questionPageSize) =>
+    set({ questionPageSize, questionPage: 1 }),
+  setCategoryPage: (categoryPage) => set({ categoryPage }),
+  setCategoryPageSize: (categoryPageSize) =>
+    set({ categoryPageSize, categoryPage: 1 }),
   clearNotice: () => set({ notice: null }),
 
   openCreateCategoryModal: () =>

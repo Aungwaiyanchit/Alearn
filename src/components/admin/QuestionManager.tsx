@@ -2,9 +2,13 @@
 
 import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { PaginationControls } from "@/components/ui/PaginationControls";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
+import { paginateItems } from "@/lib/pagination";
 import { useAdminStore } from "@/store/use-admin-store";
 import type { Difficulty } from "@/types/practice";
+
+const QUESTION_PAGE_SIZES = [5, 10, 20] as const;
 
 const DIFFICULTY_FILTERS: Array<{ value: Difficulty | "all"; label: string }> =
   [
@@ -20,6 +24,8 @@ export function QuestionManager() {
   const searchQuery = useAdminStore((state) => state.searchQuery);
   const filterCategoryId = useAdminStore((state) => state.filterCategoryId);
   const filterDifficulty = useAdminStore((state) => state.filterDifficulty);
+  const questionPage = useAdminStore((state) => state.questionPage);
+  const questionPageSize = useAdminStore((state) => state.questionPageSize);
   const isSaving = useAdminStore((state) => state.isSaving);
 
   const setSearchQuery = useAdminStore((state) => state.setSearchQuery);
@@ -28,6 +34,10 @@ export function QuestionManager() {
   );
   const setFilterDifficulty = useAdminStore(
     (state) => state.setFilterDifficulty,
+  );
+  const setQuestionPage = useAdminStore((state) => state.setQuestionPage);
+  const setQuestionPageSize = useAdminStore(
+    (state) => state.setQuestionPageSize,
   );
   const openCreateQuestionModal = useAdminStore(
     (state) => state.openCreateQuestionModal,
@@ -80,6 +90,11 @@ export function QuestionManager() {
       return haystack.includes(query);
     });
   }, [questions, searchQuery, filterCategoryId, filterDifficulty]);
+
+  const pagination = useMemo(
+    () => paginateItems(filteredQuestions, questionPage, questionPageSize),
+    [filteredQuestions, questionPage, questionPageSize],
+  );
 
   const hasActiveFilters =
     searchQuery.trim().length > 0 ||
@@ -187,99 +202,114 @@ export function QuestionManager() {
           No matching questions found. Try clearing filters or add a new prompt.
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {filteredQuestions.map((question) => {
-            const diffStyle = DIFFICULTY_STYLES[question.difficulty];
-            const isConfirming = pendingDeleteId === question.id;
+        <>
+          <div className="flex flex-col gap-3">
+            {pagination.items.map((question) => {
+              const diffStyle = DIFFICULTY_STYLES[question.difficulty];
+              const isConfirming = pendingDeleteId === question.id;
 
-            return (
-              <article
-                key={question.id}
-                className="rounded-2xl border border-stone-200/90 bg-white p-4 shadow-xs transition hover:border-stone-300"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] font-semibold text-stone-700">
-                        {question.categoryName ?? question.categoryId}
-                      </span>
-                      <span
-                        className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${diffStyle.className}`}
-                      >
-                        {diffStyle.label}
-                      </span>
-                      {question.acceptedAnswers.length > 0 && (
-                        <span className="text-[11px] text-stone-400">
-                          +{question.acceptedAnswers.length} accepted alt
-                          {question.acceptedAnswers.length === 1 ? "" : "s"}
+              return (
+                <article
+                  key={question.id}
+                  className="rounded-2xl border border-stone-200/90 bg-white p-4 shadow-xs transition hover:border-stone-300"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] font-semibold text-stone-700">
+                          {question.categoryName ?? question.categoryId}
                         </span>
+                        <span
+                          className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${diffStyle.className}`}
+                        >
+                          {diffStyle.label}
+                        </span>
+                        {question.acceptedAnswers.length > 0 && (
+                          <span className="text-[11px] text-stone-400">
+                            +{question.acceptedAnswers.length} accepted alt
+                            {question.acceptedAnswers.length === 1 ? "" : "s"}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="mt-2 font-myanmar text-base font-semibold text-stone-900">
+                        {question.burmesePrompt}
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-emerald-800">
+                        {question.englishAnswer}
+                      </p>
+
+                      {question.hint && (
+                        <p className="mt-1.5 font-myanmar text-xs text-stone-500">
+                          <span className="font-sans font-semibold text-stone-600">
+                            Hint:{" "}
+                          </span>
+                          {question.hint}
+                        </p>
                       )}
                     </div>
 
-                    <p className="mt-2 font-myanmar text-base font-semibold text-stone-900">
-                      {question.burmesePrompt}
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-emerald-800">
-                      {question.englishAnswer}
-                    </p>
-
-                    {question.hint && (
-                      <p className="mt-1.5 font-myanmar text-xs text-stone-500">
-                        <span className="font-sans font-semibold text-stone-600">
-                          Hint:{" "}
-                        </span>
-                        {question.hint}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => openEditQuestionModal(question)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                      <span>Edit</span>
-                    </button>
-
-                    {isConfirming ? (
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          disabled={isSaving}
-                          onClick={async () => {
-                            setPendingDeleteId(null);
-                            await deleteQuestion(question.id);
-                          }}
-                          className="rounded-lg bg-rose-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-60"
-                        >
-                          Confirm
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPendingDeleteId(null)}
-                          className="rounded-lg border border-stone-200 px-2 py-1.5 text-xs text-stone-600 hover:bg-stone-50"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
+                    <div className="flex shrink-0 items-center gap-1.5">
                       <button
                         type="button"
-                        onClick={() => setPendingDeleteId(question.id)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-rose-600 transition hover:border-rose-200 hover:bg-rose-50"
+                        onClick={() => openEditQuestionModal(question)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50"
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        <span>Delete</span>
+                        <Pencil className="h-3.5 w-3.5" />
+                        <span>Edit</span>
                       </button>
-                    )}
+
+                      {isConfirming ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            disabled={isSaving}
+                            onClick={async () => {
+                              setPendingDeleteId(null);
+                              await deleteQuestion(question.id);
+                            }}
+                            className="rounded-lg bg-rose-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 disabled:opacity-60"
+                          >
+                            Confirm
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPendingDeleteId(null)}
+                            className="rounded-lg border border-stone-200 px-2 py-1.5 text-xs text-stone-600 hover:bg-stone-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setPendingDeleteId(question.id)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-rose-600 transition hover:border-rose-200 hover:bg-rose-50"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span>Delete</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <PaginationControls
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            pageSize={pagination.pageSize}
+            pageSizeOptions={QUESTION_PAGE_SIZES}
+            itemLabel="questions"
+            onPageChange={setQuestionPage}
+            onPageSizeChange={setQuestionPageSize}
+          />
+        </>
       )}
     </section>
   );
