@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { AdminFormLayout } from "@/components/admin/forms/AdminFormLayout";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import type { Category, Difficulty, LessonQuestion } from "@/types/practice";
 
 const DIFFICULTIES: Difficulty[] = ["beginner", "intermediate", "advanced"];
@@ -130,19 +131,19 @@ export function QuestionFormView({
               >
                 Category *
               </label>
-              <select
+              <SelectDropdown
                 id="q-category"
-                required
+                ariaLabel="Question category"
                 value={categoryId}
-                onChange={(event) => setCategoryId(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/15"
-              >
-                {regularCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+                options={regularCategories.map((category) => ({
+                  value: category.id,
+                  label: category.name,
+                  description: category.burmeseName,
+                }))}
+                onChange={setCategoryId}
+                placeholder="Choose a category"
+                className="mt-1.5"
+              />
             </div>
 
             <div>

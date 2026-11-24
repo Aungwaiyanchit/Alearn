@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/ui/PaginationControls";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
 import { paginateItems } from "@/lib/pagination";
 import { useAdminStore } from "@/store/use-admin-store";
@@ -187,34 +188,32 @@ export function QuestionManager() {
           )}
         </div>
 
-        <select
-          aria-label="Filter by category"
+        <SelectDropdown
+          size="sm"
+          ariaLabel="Filter by category"
           value={filterCategoryId}
-          onChange={(event) => setFilterCategoryId(event.target.value)}
-          className="rounded-xl border border-stone-200 bg-stone-50/70 px-3 py-2 text-xs font-medium text-stone-700 outline-none focus:border-amber-500 focus:bg-white"
-        >
-          <option value="all">All Categories</option>
-          {regularCategories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+          options={[
+            { value: "all", label: "All Categories" },
+            ...regularCategories.map((category) => ({
+              value: category.id,
+              label: category.name,
+              description: category.burmeseName,
+            })),
+          ]}
+          onChange={setFilterCategoryId}
+          className="sm:w-52"
+        />
 
-        <select
-          aria-label="Filter by difficulty"
+        <SelectDropdown
+          size="sm"
+          ariaLabel="Filter by difficulty"
           value={filterDifficulty}
-          onChange={(event) =>
-            setFilterDifficulty(event.target.value as Difficulty | "all")
+          options={DIFFICULTY_FILTERS}
+          onChange={(nextValue) =>
+            setFilterDifficulty(nextValue as Difficulty | "all")
           }
-          className="rounded-xl border border-stone-200 bg-stone-50/70 px-3 py-2 text-xs font-medium text-stone-700 outline-none focus:border-amber-500 focus:bg-white"
-        >
-          {DIFFICULTY_FILTERS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          className="sm:w-40"
+        />
 
         {hasActiveFilters && (
           <button

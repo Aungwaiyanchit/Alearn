@@ -16,6 +16,7 @@ import {
   GuideExamplesEditor,
 } from "@/components/admin/forms/GuideExamplesEditor";
 import { TenseTimelineVisual } from "@/components/guide/TenseTimelineVisual";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { TIMELINE_TYPE_OPTIONS } from "@/types/admin";
 import type {
   LessonTrack,
@@ -269,17 +270,20 @@ export function GuideLessonFormView({
               >
                 Track
               </label>
-              <select
+              <SelectDropdown
                 id="guide-track"
+                size="sm"
+                ariaLabel="Lesson track"
                 value={track}
-                onChange={(event) =>
-                  setTrack(event.target.value as Exclude<LessonTrack, "all">)
+                options={[
+                  { value: "tenses", label: "Tenses" },
+                  { value: "grammar", label: "Grammar Rule" },
+                ]}
+                onChange={(nextValue) =>
+                  setTrack(nextValue as Exclude<LessonTrack, "all">)
                 }
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3 py-2.5 text-xs font-medium text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              >
-                <option value="tenses">Tenses</option>
-                <option value="grammar">Grammar Rule</option>
-              </select>
+                className="mt-1.5"
+              />
             </div>
 
             <div>
@@ -295,7 +299,7 @@ export function GuideLessonFormView({
                 value={subgroup}
                 onChange={(event) => setSubgroup(event.target.value)}
                 placeholder="e.g., Past Habits"
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 shadow-2xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15"
               />
             </div>
 
@@ -306,18 +310,18 @@ export function GuideLessonFormView({
               >
                 Difficulty Level
               </label>
-              <select
+              <SelectDropdown
                 id="guide-level"
+                size="sm"
+                ariaLabel="Difficulty level"
                 value={level}
-                onChange={(event) => setLevel(event.target.value as Difficulty)}
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3 py-2.5 text-xs font-medium capitalize text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              >
-                {LEVELS.map((lvl) => (
-                  <option key={lvl} value={lvl}>
-                    {lvl}
-                  </option>
-                ))}
-              </select>
+                options={LEVELS.map((lvl) => ({
+                  value: lvl,
+                  label: lvl.charAt(0).toUpperCase() + lvl.slice(1),
+                }))}
+                onChange={(nextValue) => setLevel(nextValue as Difficulty)}
+                className="mt-1.5"
+              />
             </div>
 
             <div>
@@ -327,21 +331,28 @@ export function GuideLessonFormView({
               >
                 Practice Link
               </label>
-              <select
+              <SelectDropdown
                 id="guide-practice-cat"
+                size="sm"
+                ariaLabel="Linked practice category"
                 value={practiceCategoryId}
-                onChange={(event) => setPracticeCategoryId(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3 py-2.5 text-xs font-medium text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              >
-                <option value="random-mix">Random Mix</option>
-                {categories
-                  .filter((cat) => !cat.isRandom)
-                  .map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-              </select>
+                options={[
+                  {
+                    value: "random-mix",
+                    label: "Random Mix",
+                    description: "ကဏ္ဍစုံမှ ကျပန်း",
+                  },
+                  ...categories
+                    .filter((cat) => !cat.isRandom)
+                    .map((cat) => ({
+                      value: cat.id,
+                      label: cat.name,
+                      description: cat.burmeseName,
+                    })),
+                ]}
+                onChange={setPracticeCategoryId}
+                className="mt-1.5"
+              />
             </div>
           </div>
 
@@ -397,20 +408,17 @@ export function GuideLessonFormView({
               >
                 Timeline Visual Style
               </label>
-              <select
+              <SelectDropdown
                 id="guide-timeline"
+                size="sm"
+                ariaLabel="Timeline visual style"
                 value={timelineType}
-                onChange={(event) =>
-                  setTimelineType(event.target.value as TimelineVisualType)
+                options={TIMELINE_TYPE_OPTIONS}
+                onChange={(nextValue) =>
+                  setTimelineType(nextValue as TimelineVisualType)
                 }
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs font-medium text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              >
-                {TIMELINE_TYPE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                className="mt-1.5"
+              />
             </div>
 
             <div>

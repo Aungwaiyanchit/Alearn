@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { getVisiblePageSlots } from "@/lib/pagination";
 
 interface PaginationControlsProps {
@@ -90,22 +91,23 @@ export function PaginationControls({
         </span>
 
         {pageSizeOptions && pageSize && onPageSizeChange && (
-          <label className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+          <div className="inline-flex items-center gap-2 text-xs text-slate-500">
             <span>Per page</span>
-            <select
-              value={pageSize}
-              onChange={(event) =>
-                onPageSizeChange(Number.parseInt(event.target.value, 10))
+            <SelectDropdown
+              size="sm"
+              menuPlacement="top"
+              ariaLabel="Items per page"
+              value={String(pageSize)}
+              options={pageSizeOptions.map((option) => ({
+                value: String(option),
+                label: String(option),
+              }))}
+              onChange={(nextValue) =>
+                onPageSizeChange(Number.parseInt(nextValue, 10))
               }
-              className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
-            >
-              {pageSizeOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
+              className="w-20"
+            />
+          </div>
         )}
       </div>
 

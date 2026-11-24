@@ -4,6 +4,7 @@ import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/ui/PaginationControls";
+import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
 import { paginateItems } from "@/lib/pagination";
 import { useAdminStore } from "@/store/use-admin-store";
@@ -120,20 +121,16 @@ export function GuideLessonManager() {
           )}
         </div>
 
-        <select
-          aria-label="Filter guide lessons by track"
+        <SelectDropdown
+          size="sm"
+          ariaLabel="Filter guide lessons by track"
           value={guideTrackFilter}
-          onChange={(event) =>
-            setGuideTrackFilter(event.target.value as LessonTrack)
+          options={TRACK_OPTIONS}
+          onChange={(nextValue) =>
+            setGuideTrackFilter(nextValue as LessonTrack)
           }
-          className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs font-medium text-slate-700 outline-none focus:border-blue-500 focus:bg-white"
-        >
-          {TRACK_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          className="sm:w-44"
+        />
 
         {hasFilters && (
           <button
