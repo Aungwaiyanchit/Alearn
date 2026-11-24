@@ -31,7 +31,6 @@ const LEVELS: Difficulty[] = ["beginner", "intermediate", "advanced"];
 
 interface GuideLessonFormViewProps {
   initialLesson?: TenseLesson | null;
-  allLessons: TenseLesson[];
   categories: Category[];
   guideTips: WritingTip[];
   databasePath: string;
@@ -39,7 +38,6 @@ interface GuideLessonFormViewProps {
 
 export function GuideLessonFormView({
   initialLesson = null,
-  allLessons,
   categories,
   guideTips,
   databasePath,
@@ -224,8 +222,6 @@ export function GuideLessonFormView({
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         <div className="lg:sticky lg:top-24 lg:col-span-3">
           <GuideEditorSidebar
-            currentLessonId={initialLesson?.id ?? null}
-            allLessons={allLessons}
             exampleCount={
               examples.filter((ex) => ex.burmese.trim() || ex.english.trim())
                 .length
