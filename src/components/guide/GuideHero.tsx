@@ -2,19 +2,18 @@
 
 import { ArrowRight, PenLine, Shuffle } from "lucide-react";
 import Link from "next/link";
-import { TENSE_LESSONS } from "@/data/lessons-guide-data";
+import type { TenseLesson } from "@/types/guide";
 import type { PracticeStats } from "@/types/practice";
 
 interface GuideHeroProps {
+  lessons: TenseLesson[];
   stats: PracticeStats;
   categoryCount: number;
 }
 
-export function GuideHero({ stats, categoryCount }: GuideHeroProps) {
-  const tenseCount = TENSE_LESSONS.filter((l) => l.track === "tenses").length;
-  const grammarCount = TENSE_LESSONS.filter(
-    (l) => l.track === "grammar",
-  ).length;
+export function GuideHero({ lessons, stats, categoryCount }: GuideHeroProps) {
+  const tenseCount = lessons.filter((l) => l.track === "tenses").length;
+  const grammarCount = lessons.filter((l) => l.track === "grammar").length;
 
   return (
     <section className="flex flex-col justify-between gap-6 border-b border-slate-200/80 pb-8 lg:flex-row lg:items-end">

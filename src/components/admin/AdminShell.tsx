@@ -1,7 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpen, CheckCircle2, FolderKanban, X, XCircle } from "lucide-react";
+import {
+  BookOpen,
+  BookOpenCheck,
+  CheckCircle2,
+  FolderKanban,
+  X,
+  XCircle,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminStatsBar } from "@/components/admin/AdminStatsBar";
@@ -9,14 +16,19 @@ import { BulkCsvImportModal } from "@/components/admin/BulkCsvImportModal";
 import { CategoryFormModal } from "@/components/admin/CategoryFormModal";
 import { CategoryManager } from "@/components/admin/CategoryManager";
 import { DestroyAllModal } from "@/components/admin/DestroyAllModal";
+import { GuideLessonFormModal } from "@/components/admin/GuideLessonFormModal";
+import { GuideLessonManager } from "@/components/admin/GuideLessonManager";
 import { QuestionFormModal } from "@/components/admin/QuestionFormModal";
 import { QuestionManager } from "@/components/admin/QuestionManager";
 import { useAdminStore } from "@/store/use-admin-store";
+import type { TenseLesson, WritingTip } from "@/types/guide";
 import type { Category, LessonQuestion, PracticeStats } from "@/types/practice";
 
 interface AdminShellProps {
   initialCategories: Category[];
   initialQuestions: LessonQuestion[];
+  initialGuideLessons: TenseLesson[];
+  initialGuideTips: WritingTip[];
   initialStats: PracticeStats;
   databasePath: string;
 }
@@ -24,6 +36,8 @@ interface AdminShellProps {
 export function AdminShell({
   initialCategories,
   initialQuestions,
+  initialGuideLessons,
+  initialGuideTips,
   initialStats,
   databasePath,
 }: AdminShellProps) {
@@ -40,6 +54,8 @@ export function AdminShell({
       hydrateInitial({
         categories: initialCategories,
         questions: initialQuestions,
+        guideLessons: initialGuideLessons,
+        guideTips: initialGuideTips,
         stats: initialStats,
         databasePath,
       });
@@ -48,6 +64,8 @@ export function AdminShell({
     hydrateInitial,
     initialCategories,
     initialQuestions,
+    initialGuideLessons,
+    initialGuideTips,
     initialStats,
     databasePath,
   ]);
@@ -104,14 +122,14 @@ export function AdminShell({
         </AnimatePresence>
 
         {/* Tab Navigation */}
-        <div className="inline-flex w-fit items-center gap-1 rounded-2xl border border-stone-200/90 bg-white p-1 shadow-xs">
+        <div className="inline-flex w-fit flex-wrap items-center gap-1 rounded-2xl border border-slate-200/80 bg-white p-1 shadow-xs">
           <button
             type="button"
             onClick={() => setActiveTab("questions")}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
               activeTab === "questions"
-                ? "bg-stone-900 text-white shadow-xs"
-                : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             }`}
           >
             <BookOpen className="h-3.5 w-3.5" />
@@ -123,20 +141,36 @@ export function AdminShell({
             onClick={() => setActiveTab("categories")}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
               activeTab === "categories"
-                ? "bg-stone-900 text-white shadow-xs"
-                : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             }`}
           >
             <FolderKanban className="h-3.5 w-3.5" />
             <span>Categories</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("guide")}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+              activeTab === "guide"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            }`}
+          >
+            <BookOpenCheck className="h-3.5 w-3.5" />
+            <span>Lessons Guide</span>
+          </button>
         </div>
 
-        {activeTab === "questions" ? <QuestionManager /> : <CategoryManager />}
+        {activeTab === "questions" && <QuestionManager />}
+        {activeTab === "categories" && <CategoryManager />}
+        {activeTab === "guide" && <GuideLessonManager />}
       </main>
 
       <CategoryFormModal />
       <QuestionFormModal />
+      <GuideLessonFormModal />
       <BulkCsvImportModal />
       <DestroyAllModal />
     </div>

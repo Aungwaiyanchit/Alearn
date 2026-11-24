@@ -1,16 +1,18 @@
 "use client";
 
 import { CheckCircle2, Lightbulb, XCircle } from "lucide-react";
-import { WRITING_TIPS } from "@/data/lessons-guide-data";
+import { useGuideStore } from "@/store/use-guide-store";
+import type { WritingTip } from "@/types/guide";
 
 interface LessonRelatedTipsProps {
   tipIds: string[];
 }
 
 export function LessonRelatedTips({ tipIds }: LessonRelatedTipsProps) {
+  const allTips = useGuideStore((state) => state.tips);
   const tips = tipIds
-    .map((id) => WRITING_TIPS.find((tip) => tip.id === id))
-    .filter((tip): tip is (typeof WRITING_TIPS)[number] => Boolean(tip));
+    .map((id) => allTips.find((tip) => tip.id === id))
+    .filter((tip): tip is WritingTip => Boolean(tip));
 
   if (tips.length === 0) {
     return null;

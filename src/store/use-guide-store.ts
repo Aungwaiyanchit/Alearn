@@ -1,15 +1,20 @@
 "use client";
 
 import { create } from "zustand";
-import { TENSE_LESSONS } from "@/data/lessons-guide-data";
-import type { LessonTrack } from "@/types/guide";
+import type { LessonTrack, TenseLesson, WritingTip } from "@/types/guide";
 
 interface GuideState {
+  lessons: TenseLesson[];
+  tips: WritingTip[];
   selectedTrack: LessonTrack;
   searchQuery: string;
   selectedLessonId: string;
   lessonPage: number;
 
+  hydrateInitial: (params: {
+    lessons: TenseLesson[];
+    tips: WritingTip[];
+  }) => void;
   setSelectedTrack: (track: LessonTrack) => void;
   setSearchQuery: (query: string) => void;
   selectLesson: (lessonId: string) => void;
@@ -17,18 +22,34 @@ interface GuideState {
 }
 
 export const useGuideStore = create<GuideState>((set) => ({
+  lessons: [],
+  tips: [],
   selectedTrack: "all",
   searchQuery: "",
-  selectedLessonId: TENSE_LESSONS[0]?.id ?? "present-simple",
+  selectedLessonId: "",
   lessonPage: 1,
 
-  setSelectedTrack: (selectedTrack) => {
-    const matching =
-      selectedTrack === "all"
-        ? TENSE_LESSONS
-        : TENSE_LESSONS.filter((lesson) => lesson.track === selectedTrack);
-
+  hydrateInitial: ({ lessons, tips }) =>
     set((state) => {
+      const stillExists = lessons.some(
+        (lesson) => lesson.id === state.selectedLessonId,
+      );
+      return {
+        lessons,
+        tips,
+        selectedLessonId: stillExists
+          ? state.selectedLessonId
+          : (lessons[0]?.id ?? ""),
+      };
+    }),
+
+  setSelectedTrack: (selectedTrack) =>
+    set((state) => {
+      const matching =
+        selectedTrack === "all"
+          ? state.lessons
+          : state.lessons.filter((lesson) => lesson.track === selectedTrack);
+
       const stillVisible = matching.some(
         (lesson) => lesson.id === state.selectedLessonId,
       );
@@ -37,10 +58,9 @@ export const useGuideStore = create<GuideState>((set) => ({
         lessonPage: 1,
         selectedLessonId: stillVisible
           ? state.selectedLessonId
-          : (matching[0]?.id ?? state.selectedLessonId),
+          : (matching[0]?.id ?? ""),
       };
-    });
-  },
+    }),
 
   setSearchQuery: (searchQuery) => set({ searchQuery, lessonPage: 1 }),
   selectLesson: (selectedLessonId) => set({ selectedLessonId }),

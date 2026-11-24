@@ -9,6 +9,7 @@ export function DestroyAllModal() {
   const isOpen = useAdminStore((state) => state.isDestroyModalOpen);
   const categories = useAdminStore((state) => state.categories);
   const questions = useAdminStore((state) => state.questions);
+  const guideLessons = useAdminStore((state) => state.guideLessons);
   const stats = useAdminStore((state) => state.stats);
   const isSaving = useAdminStore((state) => state.isSaving);
   const closeModal = useAdminStore((state) => state.closeDestroyModal);
@@ -85,6 +86,9 @@ export function DestroyAllModal() {
                 </li>
                 <li>
                   <strong>{questions.length}</strong> practice questions
+                </li>
+                <li>
+                  <strong>{guideLessons.length}</strong> guide lessons
                 </li>
                 <li>
                   <strong>{stats.totalAttempts}</strong> practice attempts

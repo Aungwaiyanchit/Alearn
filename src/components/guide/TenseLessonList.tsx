@@ -3,7 +3,6 @@
 import { Search, X } from "lucide-react";
 import { useMemo } from "react";
 import { PaginationControls } from "@/components/ui/PaginationControls";
-import { TENSE_LESSONS } from "@/data/lessons-guide-data";
 import { paginateItems } from "@/lib/pagination";
 import { useGuideStore } from "@/store/use-guide-store";
 import type { LessonTrack } from "@/types/guide";
@@ -11,6 +10,7 @@ import type { LessonTrack } from "@/types/guide";
 const LESSONS_PER_PAGE = 7;
 
 export function TenseLessonList() {
+  const lessons = useGuideStore((state) => state.lessons);
   const selectedTrack = useGuideStore((state) => state.selectedTrack);
   const searchQuery = useGuideStore((state) => state.searchQuery);
   const selectedLessonId = useGuideStore((state) => state.selectedLessonId);
@@ -24,25 +24,25 @@ export function TenseLessonList() {
   const trackTabs: Array<{ value: LessonTrack; label: string; count: number }> =
     useMemo(
       () => [
-        { value: "all", label: "All", count: TENSE_LESSONS.length },
+        { value: "all", label: "All", count: lessons.length },
         {
           value: "tenses",
           label: "Tenses",
-          count: TENSE_LESSONS.filter((l) => l.track === "tenses").length,
+          count: lessons.filter((l) => l.track === "tenses").length,
         },
         {
           value: "grammar",
           label: "Grammar",
-          count: TENSE_LESSONS.filter((l) => l.track === "grammar").length,
+          count: lessons.filter((l) => l.track === "grammar").length,
         },
       ],
-      [],
+      [lessons],
     );
 
   const filteredLessons = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    return TENSE_LESSONS.filter((lesson) => {
+    return lessons.filter((lesson) => {
       if (selectedTrack !== "all" && lesson.track !== selectedTrack) {
         return false;
       }
@@ -63,7 +63,7 @@ export function TenseLessonList() {
 
       return haystack.includes(query);
     });
-  }, [selectedTrack, searchQuery]);
+  }, [lessons, selectedTrack, searchQuery]);
 
   const pagination = useMemo(
     () => paginateItems(filteredLessons, lessonPage, LESSONS_PER_PAGE),

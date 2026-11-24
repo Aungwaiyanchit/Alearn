@@ -3,8 +3,10 @@
 import { create } from "zustand";
 import type {
   CategoryMutationInput,
+  GuideLessonMutationInput,
   QuestionMutationInput,
 } from "@/types/admin";
+import type { LessonTrack, TenseLesson, WritingTip } from "@/types/guide";
 import type {
   Category,
   Difficulty,
@@ -12,7 +14,7 @@ import type {
   PracticeStats,
 } from "@/types/practice";
 
-export type AdminTab = "questions" | "categories";
+export type AdminTab = "questions" | "categories" | "guide";
 
 export interface AdminNotice {
   id: number;
@@ -23,6 +25,8 @@ export interface AdminNotice {
 interface AdminState {
   categories: Category[];
   questions: LessonQuestion[];
+  guideLessons: TenseLesson[];
+  guideTips: WritingTip[];
   stats: PracticeStats;
   databasePath: string;
   activeTab: AdminTab;
@@ -33,6 +37,10 @@ interface AdminState {
   questionPageSize: number;
   categoryPage: number;
   categoryPageSize: number;
+  guideSearchQuery: string;
+  guideTrackFilter: LessonTrack;
+  guidePage: number;
+  guidePageSize: number;
   isSaving: boolean;
   notice: AdminNotice | null;
 
@@ -41,12 +49,16 @@ interface AdminState {
   editingCategory: Category | null;
   isQuestionModalOpen: boolean;
   editingQuestion: LessonQuestion | null;
+  isGuideModalOpen: boolean;
+  editingGuideLesson: TenseLesson | null;
   isBulkImportModalOpen: boolean;
   isDestroyModalOpen: boolean;
 
   hydrateInitial: (params: {
     categories: Category[];
     questions: LessonQuestion[];
+    guideLessons: TenseLesson[];
+    guideTips: WritingTip[];
     stats: PracticeStats;
     databasePath: string;
   }) => void;
@@ -58,6 +70,10 @@ interface AdminState {
   setQuestionPageSize: (pageSize: number) => void;
   setCategoryPage: (page: number) => void;
   setCategoryPageSize: (pageSize: number) => void;
+  setGuideSearchQuery: (query: string) => void;
+  setGuideTrackFilter: (track: LessonTrack) => void;
+  setGuidePage: (page: number) => void;
+  setGuidePageSize: (pageSize: number) => void;
   clearNotice: () => void;
 
   openCreateCategoryModal: () => void;
@@ -68,6 +84,10 @@ interface AdminState {
   openEditQuestionModal: (question: LessonQuestion) => void;
   closeQuestionModal: () => void;
 
+  openCreateGuideModal: () => void;
+  openEditGuideModal: (lesson: TenseLesson) => void;
+  closeGuideModal: () => void;
+
   openBulkImportModal: () => void;
   closeBulkImportModal: () => void;
   openDestroyModal: () => void;
@@ -77,6 +97,8 @@ interface AdminState {
   deleteCategory: (id: string) => Promise<void>;
   saveQuestion: (input: QuestionMutationInput) => Promise<void>;
   deleteQuestion: (id: string) => Promise<void>;
+  saveGuideLesson: (input: GuideLessonMutationInput) => Promise<void>;
+  deleteGuideLesson: (id: string) => Promise<void>;
   bulkImportCsv: (csvText: string) => Promise<boolean>;
   resetProgress: () => Promise<void>;
   destroyEverything: (confirmation: string) => Promise<boolean>;
@@ -93,6 +115,8 @@ const DEFAULT_STATS: PracticeStats = {
 export const useAdminStore = create<AdminState>((set, get) => ({
   categories: [],
   questions: [],
+  guideLessons: [],
+  guideTips: [],
   stats: DEFAULT_STATS,
   databasePath: "",
   activeTab: "questions",
@@ -103,6 +127,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   questionPageSize: 10,
   categoryPage: 1,
   categoryPageSize: 6,
+  guideSearchQuery: "",
+  guideTrackFilter: "all",
+  guidePage: 1,
+  guidePageSize: 10,
   isSaving: false,
   notice: null,
 
@@ -110,11 +138,27 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   editingCategory: null,
   isQuestionModalOpen: false,
   editingQuestion: null,
+  isGuideModalOpen: false,
+  editingGuideLesson: null,
   isBulkImportModalOpen: false,
   isDestroyModalOpen: false,
 
-  hydrateInitial: ({ categories, questions, stats, databasePath }) => {
-    set({ categories, questions, stats, databasePath });
+  hydrateInitial: ({
+    categories,
+    questions,
+    guideLessons,
+    guideTips,
+    stats,
+    databasePath,
+  }) => {
+    set({
+      categories,
+      questions,
+      guideLessons,
+      guideTips,
+      stats,
+      databasePath,
+    });
   },
 
   setActiveTab: (activeTab) => set({ activeTab }),
@@ -129,6 +173,12 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   setCategoryPage: (categoryPage) => set({ categoryPage }),
   setCategoryPageSize: (categoryPageSize) =>
     set({ categoryPageSize, categoryPage: 1 }),
+  setGuideSearchQuery: (guideSearchQuery) =>
+    set({ guideSearchQuery, guidePage: 1 }),
+  setGuideTrackFilter: (guideTrackFilter) =>
+    set({ guideTrackFilter, guidePage: 1 }),
+  setGuidePage: (guidePage) => set({ guidePage }),
+  setGuidePageSize: (guidePageSize) => set({ guidePageSize, guidePage: 1 }),
   clearNotice: () => set({ notice: null }),
 
   openCreateCategoryModal: () =>
@@ -144,6 +194,13 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ isQuestionModalOpen: true, editingQuestion: question }),
   closeQuestionModal: () =>
     set({ isQuestionModalOpen: false, editingQuestion: null }),
+
+  openCreateGuideModal: () =>
+    set({ isGuideModalOpen: true, editingGuideLesson: null }),
+  openEditGuideModal: (lesson) =>
+    set({ isGuideModalOpen: true, editingGuideLesson: lesson }),
+  closeGuideModal: () =>
+    set({ isGuideModalOpen: false, editingGuideLesson: null }),
 
   openBulkImportModal: () => set({ isBulkImportModalOpen: true }),
   closeBulkImportModal: () => set({ isBulkImportModalOpen: false }),
@@ -446,6 +503,99 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
+  saveGuideLesson: async (input) => {
+    const editing = get().editingGuideLesson;
+    set({ isSaving: true });
+
+    try {
+      const endpoint = editing
+        ? `/api/admin/guide-lessons/${editing.id}`
+        : "/api/admin/guide-lessons";
+      const method = editing ? "PATCH" : "POST";
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        guideLessons?: TenseLesson[];
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Failed to save guide lesson");
+      }
+
+      set((state) => ({
+        guideLessons: payload.guideLessons ?? state.guideLessons,
+        isSaving: false,
+        isGuideModalOpen: false,
+        editingGuideLesson: null,
+        notice: {
+          id: Date.now(),
+          type: "success",
+          message: editing
+            ? `Updated lesson "${input.title}"`
+            : `Added lesson "${input.title}"`,
+        },
+      }));
+    } catch (error) {
+      set({
+        isSaving: false,
+        notice: {
+          id: Date.now(),
+          type: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to save guide lesson",
+        },
+      });
+    }
+  },
+
+  deleteGuideLesson: async (id) => {
+    set({ isSaving: true });
+    try {
+      const response = await fetch(`/api/admin/guide-lessons/${id}`, {
+        method: "DELETE",
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        guideLessons?: TenseLesson[];
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Failed to delete guide lesson");
+      }
+
+      set((state) => ({
+        guideLessons: payload.guideLessons ?? state.guideLessons,
+        isSaving: false,
+        notice: {
+          id: Date.now(),
+          type: "success",
+          message: "Guide lesson deleted",
+        },
+      }));
+    } catch (error) {
+      set({
+        isSaving: false,
+        notice: {
+          id: Date.now(),
+          type: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to delete guide lesson",
+        },
+      });
+    }
+  },
+
   destroyEverything: async (confirmation) => {
     set({ isSaving: true });
     try {
@@ -461,9 +611,11 @@ export const useAdminStore = create<AdminState>((set, get) => ({
           deletedCategories: number;
           deletedQuestions: number;
           deletedAttempts: number;
+          deletedGuideLessons?: number;
         };
         categories?: Category[];
         questions?: LessonQuestion[];
+        guideLessons?: TenseLesson[];
         stats?: PracticeStats;
       };
 
@@ -475,19 +627,23 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       set({
         categories: payload.categories ?? [],
         questions: payload.questions ?? [],
+        guideLessons: payload.guideLessons ?? [],
         stats: payload.stats ?? DEFAULT_STATS,
         filterCategoryId: "all",
         filterDifficulty: "all",
         searchQuery: "",
+        guideSearchQuery: "",
+        guideTrackFilter: "all",
         questionPage: 1,
         categoryPage: 1,
+        guidePage: 1,
         isSaving: false,
         isDestroyModalOpen: false,
         notice: {
           id: Date.now(),
           type: "success",
           message: deleted
-            ? `Destroyed ${deleted.deletedCategories} categories, ${deleted.deletedQuestions} questions, and ${deleted.deletedAttempts} attempts`
+            ? `Destroyed ${deleted.deletedCategories} categories, ${deleted.deletedQuestions} questions, ${deleted.deletedGuideLessons ?? 0} guide lessons, and ${deleted.deletedAttempts} attempts`
             : "Destroyed all local database records",
         },
       });

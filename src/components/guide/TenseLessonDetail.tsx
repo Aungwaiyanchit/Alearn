@@ -6,24 +6,22 @@ import Link from "next/link";
 import { LessonRelatedCheatSheet } from "@/components/guide/LessonRelatedCheatSheet";
 import { LessonRelatedTips } from "@/components/guide/LessonRelatedTips";
 import { TenseTimelineVisual } from "@/components/guide/TenseTimelineVisual";
-import { TENSE_LESSONS } from "@/data/lessons-guide-data";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
 import { useGuideStore } from "@/store/use-guide-store";
 
 export function TenseLessonDetail() {
+  const lessons = useGuideStore((state) => state.lessons);
   const selectedLessonId = useGuideStore((state) => state.selectedLessonId);
   const selectLesson = useGuideStore((state) => state.selectLesson);
 
   const currentIndex = Math.max(
     0,
-    TENSE_LESSONS.findIndex((item) => item.id === selectedLessonId),
+    lessons.findIndex((item) => item.id === selectedLessonId),
   );
-  const lesson = TENSE_LESSONS[currentIndex] ?? TENSE_LESSONS[0];
-  const prevLesson = currentIndex > 0 ? TENSE_LESSONS[currentIndex - 1] : null;
+  const lesson = lessons[currentIndex] ?? lessons[0];
+  const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
   const nextLesson =
-    currentIndex < TENSE_LESSONS.length - 1
-      ? TENSE_LESSONS[currentIndex + 1]
-      : null;
+    currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null;
 
   if (!lesson) {
     return null;
