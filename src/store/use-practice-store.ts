@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { evaluateAnswer } from "@/lib/answer-evaluator";
+import { useProgressStore } from "@/store/use-progress-store";
 import type {
   Category,
   CreateRandomCategoryInput,
@@ -198,31 +199,13 @@ export const usePracticeStore = create<PracticeState>((set, get) => ({
         : state.shakeCount + 1,
     });
 
-    try {
-      const response = await fetch("/api/attempts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          questionId: currentQuestion.id,
-          userAnswer: state.typedAnswer.trim(),
-          isCorrect: evaluation.isCorrect,
-          accuracy: evaluation.accuracy,
-        }),
-      });
-
-      if (response.ok) {
-        const data = (await response.json()) as {
-          stats: PracticeStats;
-          categories: Category[];
-        };
-        set({
-          stats: data.stats,
-          categories: data.categories,
-        });
-      }
-    } catch {
-      // Keep optimistic UI state even if background persistence momentarily fails
-    }
+    // Persist personal mastered score & accuracy in browser localStorage
+    useProgressStore.getState().recordAttempt({
+      questionId: currentQuestion.id,
+      isCorrect: evaluation.isCorrect,
+      accuracy: evaluation.accuracy,
+      currentStreak: nextStreak,
+    });
   },
 
   retryCurrent: () => {

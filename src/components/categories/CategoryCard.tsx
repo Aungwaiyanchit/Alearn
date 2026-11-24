@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import { CategoryIcon } from "@/components/categories/CategoryIcon";
 import { getAccentPalette } from "@/lib/category-styles";
+import { countMasteredInCategory } from "@/lib/local-progress";
+import { useProgressStore } from "@/store/use-progress-store";
 import type { Category } from "@/types/practice";
 
 interface CategoryCardProps {
@@ -20,11 +22,18 @@ export function CategoryCard({
   onDelete,
 }: CategoryCardProps) {
   const palette = getAccentPalette(category.accentColor);
+  const masteredQuestionIds = useProgressStore(
+    (state) => state.progress.masteredQuestionIds,
+  );
+  const completedCount = countMasteredInCategory(
+    category.questionIds,
+    masteredQuestionIds,
+  );
   const progressPct =
     category.questionCount > 0
       ? Math.min(
           100,
-          Math.round((category.completedCount / category.questionCount) * 100),
+          Math.round((completedCount / category.questionCount) * 100),
         )
       : 0;
 
@@ -75,7 +84,7 @@ export function CategoryCard({
               />
             </div>
             <span className="text-[10px] font-medium tabular-nums text-slate-400">
-              {category.completedCount}/{category.questionCount}
+              {completedCount}/{category.questionCount}
             </span>
           </div>
         </div>

@@ -11,6 +11,7 @@ export interface Category {
   isRandom: boolean;
   questionCount: number;
   completedCount: number;
+  questionIds: string[];
   createdAt: string;
 }
 

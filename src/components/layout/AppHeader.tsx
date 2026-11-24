@@ -1,9 +1,12 @@
 "use client";
 
-import { BookOpen, Dices, PenLine, ShieldCheck } from "lucide-react";
+import { BookOpen, Dices, PenLine, RotateCcw, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import { computePracticeStatsFromLocal } from "@/lib/local-progress";
 import { usePracticeStore } from "@/store/use-practice-store";
+import { useProgressStore } from "@/store/use-progress-store";
 import type { PracticeStats } from "@/types/practice";
 
 interface AppHeaderProps {
@@ -19,10 +22,46 @@ export function AppHeader({
 }: AppHeaderProps) {
   const pathname = usePathname();
   const storeStats = usePracticeStore((state) => state.stats);
+  const categories = usePracticeStore((state) => state.categories);
   const openRandomModal = usePracticeStore((state) => state.openRandomModal);
 
-  const stats =
-    storeStats.totalQuestions > 0 ? storeStats : (initialStats ?? storeStats);
+  const localProgress = useProgressStore((state) => state.progress);
+  const hydrateFromStorage = useProgressStore(
+    (state) => state.hydrateFromStorage,
+  );
+  const resetProgress = useProgressStore((state) => state.resetProgress);
+
+  useEffect(() => {
+    hydrateFromStorage();
+  }, [hydrateFromStorage]);
+
+  const totalQuestions =
+    storeStats.totalQuestions > 0
+      ? storeStats.totalQuestions
+      : (initialStats?.totalQuestions ?? 0);
+
+  const validQuestionIds = useMemo(() => {
+    if (categories.length === 0) {
+      return undefined;
+    }
+    const ids = new Set<string>();
+    for (const cat of categories) {
+      for (const qId of cat.questionIds ?? []) {
+        ids.add(qId);
+      }
+    }
+    return ids.size > 0 ? ids : undefined;
+  }, [categories]);
+
+  const stats = useMemo(
+    () =>
+      computePracticeStatsFromLocal(
+        localProgress,
+        totalQuestions,
+        validQuestionIds,
+      ),
+    [localProgress, totalQuestions, validQuestionIds],
+  );
 
   const isGuideActive = pathname === "/";
   const isPracticeActive = pathname.startsWith("/practice");
@@ -94,6 +133,17 @@ export function AppHeader({
               {stats.masteredCount}/{stats.totalQuestions}
             </span>
             <span>mastered</span>
+            {stats.totalAttempts > 0 && (
+              <button
+                type="button"
+                onClick={resetProgress}
+                title="Reset my local mastered score"
+                aria-label="Reset my local mastered score"
+                className="ml-0.5 rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              >
+                <RotateCcw className="h-3 w-3" />
+              </button>
+            )}
           </div>
 
           {showRandomModalTrigger ? (

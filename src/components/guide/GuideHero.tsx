@@ -2,6 +2,9 @@
 
 import { ArrowRight, PenLine, Shuffle } from "lucide-react";
 import Link from "next/link";
+import { useMemo } from "react";
+import { computePracticeStatsFromLocal } from "@/lib/local-progress";
+import { useProgressStore } from "@/store/use-progress-store";
 import type { TenseLesson } from "@/types/guide";
 import type { PracticeStats } from "@/types/practice";
 
@@ -12,6 +15,11 @@ interface GuideHeroProps {
 }
 
 export function GuideHero({ lessons, stats, categoryCount }: GuideHeroProps) {
+  const localProgress = useProgressStore((state) => state.progress);
+  const localStats = useMemo(
+    () => computePracticeStatsFromLocal(localProgress, stats.totalQuestions),
+    [localProgress, stats.totalQuestions],
+  );
   const tenseCount = lessons.filter((l) => l.track === "tenses").length;
   const grammarCount = lessons.filter((l) => l.track === "grammar").length;
 
@@ -50,7 +58,7 @@ export function GuideHero({ lessons, stats, categoryCount }: GuideHeroProps) {
           </div>
           <div>
             <span className="block text-base font-bold tabular-nums text-emerald-600">
-              {stats.averageAccuracy}%
+              {localStats.averageAccuracy}%
             </span>
             <span>Avg Accuracy</span>
           </div>

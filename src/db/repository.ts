@@ -20,6 +20,7 @@ interface CategoryRow {
   created_at: string;
   question_count: number;
   completed_count: number;
+  question_ids: string | null;
 }
 
 interface QuestionRow {
@@ -51,6 +52,13 @@ const RANDOM_BURMESE_LABELS: Record<Difficulty | "all", string> = {
 };
 
 function mapCategoryRow(row: CategoryRow): Category {
+  const questionIds = row.question_ids
+    ? row.question_ids
+        .split(",")
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0)
+    : [];
+
   return {
     id: row.id,
     slug: row.slug,
@@ -62,6 +70,7 @@ function mapCategoryRow(row: CategoryRow): Category {
     isRandom: row.is_random === 1,
     questionCount: row.question_count,
     completedCount: row.completed_count,
+    questionIds,
     createdAt: row.created_at,
   };
 }
@@ -107,10 +116,10 @@ export function listCategories(): Category[] {
         c.is_random,
         c.created_at,
         COUNT(DISTINCT cq.question_id) AS question_count,
-        COUNT(DISTINCT CASE WHEN a.is_correct = 1 THEN cq.question_id END) AS completed_count
+        0 AS completed_count,
+        GROUP_CONCAT(DISTINCT cq.question_id) AS question_ids
       FROM categories c
       LEFT JOIN category_questions cq ON cq.category_id = c.id
-      LEFT JOIN attempts a ON a.question_id = cq.question_id AND a.is_correct = 1
       GROUP BY c.id
       ORDER BY c.is_random ASC, c.created_at ASC
     `)
