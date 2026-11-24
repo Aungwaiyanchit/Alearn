@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/ui/PaginationControls";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
@@ -32,10 +33,6 @@ export function GuideLessonManager() {
   );
   const setGuidePage = useAdminStore((state) => state.setGuidePage);
   const setGuidePageSize = useAdminStore((state) => state.setGuidePageSize);
-  const openCreateGuideModal = useAdminStore(
-    (state) => state.openCreateGuideModal,
-  );
-  const openEditGuideModal = useAdminStore((state) => state.openEditGuideModal);
   const deleteGuideLesson = useAdminStore((state) => state.deleteGuideLesson);
 
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
@@ -91,14 +88,13 @@ export function GuideLessonManager() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={openCreateGuideModal}
+        <Link
+          href="/admin/guide-lessons/new"
           className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700"
         >
           <Plus className="h-3.5 w-3.5" />
           <span>New Guide Lesson</span>
-        </button>
+        </Link>
       </div>
 
       {/* Search & Track Filter Toolbar */}
@@ -201,14 +197,13 @@ export function GuideLessonManager() {
                     </div>
 
                     <div className="flex shrink-0 items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => openEditGuideModal(lesson)}
+                      <Link
+                        href={`/admin/guide-lessons/${lesson.id}/edit`}
                         className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                         <span>Edit</span>
-                      </button>
+                      </Link>
 
                       {isConfirming ? (
                         <div className="flex items-center gap-1">

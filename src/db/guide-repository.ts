@@ -158,6 +158,10 @@ export function listGuideTips(): WritingTip[] {
   return rows.map(mapGuideTipRow);
 }
 
+export function getGuideLessonById(id: string): TenseLesson | null {
+  return listGuideLessons().find((lesson) => lesson.id === id) ?? null;
+}
+
 export function createGuideLesson(
   input: GuideLessonMutationInput,
 ): TenseLesson {

@@ -1,11 +1,6 @@
 "use client";
 
 import { create } from "zustand";
-import type {
-  CategoryMutationInput,
-  GuideLessonMutationInput,
-  QuestionMutationInput,
-} from "@/types/admin";
 import type { LessonTrack, TenseLesson, WritingTip } from "@/types/guide";
 import type {
   Category,
@@ -44,17 +39,12 @@ interface AdminState {
   isSaving: boolean;
   notice: AdminNotice | null;
 
-  // Modals
-  isCategoryModalOpen: boolean;
-  editingCategory: Category | null;
-  isQuestionModalOpen: boolean;
-  editingQuestion: LessonQuestion | null;
-  isGuideModalOpen: boolean;
-  editingGuideLesson: TenseLesson | null;
+  // Quick utility dialogs
   isBulkImportModalOpen: boolean;
   isDestroyModalOpen: boolean;
 
   hydrateInitial: (params: {
+    activeTab: AdminTab;
     categories: Category[];
     questions: LessonQuestion[];
     guideLessons: TenseLesson[];
@@ -76,28 +66,13 @@ interface AdminState {
   setGuidePageSize: (pageSize: number) => void;
   clearNotice: () => void;
 
-  openCreateCategoryModal: () => void;
-  openEditCategoryModal: (category: Category) => void;
-  closeCategoryModal: () => void;
-
-  openCreateQuestionModal: () => void;
-  openEditQuestionModal: (question: LessonQuestion) => void;
-  closeQuestionModal: () => void;
-
-  openCreateGuideModal: () => void;
-  openEditGuideModal: (lesson: TenseLesson) => void;
-  closeGuideModal: () => void;
-
   openBulkImportModal: () => void;
   closeBulkImportModal: () => void;
   openDestroyModal: () => void;
   closeDestroyModal: () => void;
 
-  saveCategory: (input: CategoryMutationInput) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
-  saveQuestion: (input: QuestionMutationInput) => Promise<void>;
   deleteQuestion: (id: string) => Promise<void>;
-  saveGuideLesson: (input: GuideLessonMutationInput) => Promise<void>;
   deleteGuideLesson: (id: string) => Promise<void>;
   bulkImportCsv: (csvText: string) => Promise<boolean>;
   resetProgress: () => Promise<void>;
@@ -112,7 +87,7 @@ const DEFAULT_STATS: PracticeStats = {
   totalQuestions: 0,
 };
 
-export const useAdminStore = create<AdminState>((set, get) => ({
+export const useAdminStore = create<AdminState>((set) => ({
   categories: [],
   questions: [],
   guideLessons: [],
@@ -134,16 +109,11 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   isSaving: false,
   notice: null,
 
-  isCategoryModalOpen: false,
-  editingCategory: null,
-  isQuestionModalOpen: false,
-  editingQuestion: null,
-  isGuideModalOpen: false,
-  editingGuideLesson: null,
   isBulkImportModalOpen: false,
   isDestroyModalOpen: false,
 
   hydrateInitial: ({
+    activeTab,
     categories,
     questions,
     guideLessons,
@@ -152,6 +122,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     databasePath,
   }) => {
     set({
+      activeTab,
       categories,
       questions,
       guideLessons,
@@ -181,86 +152,10 @@ export const useAdminStore = create<AdminState>((set, get) => ({
   setGuidePageSize: (guidePageSize) => set({ guidePageSize, guidePage: 1 }),
   clearNotice: () => set({ notice: null }),
 
-  openCreateCategoryModal: () =>
-    set({ isCategoryModalOpen: true, editingCategory: null }),
-  openEditCategoryModal: (category) =>
-    set({ isCategoryModalOpen: true, editingCategory: category }),
-  closeCategoryModal: () =>
-    set({ isCategoryModalOpen: false, editingCategory: null }),
-
-  openCreateQuestionModal: () =>
-    set({ isQuestionModalOpen: true, editingQuestion: null }),
-  openEditQuestionModal: (question) =>
-    set({ isQuestionModalOpen: true, editingQuestion: question }),
-  closeQuestionModal: () =>
-    set({ isQuestionModalOpen: false, editingQuestion: null }),
-
-  openCreateGuideModal: () =>
-    set({ isGuideModalOpen: true, editingGuideLesson: null }),
-  openEditGuideModal: (lesson) =>
-    set({ isGuideModalOpen: true, editingGuideLesson: lesson }),
-  closeGuideModal: () =>
-    set({ isGuideModalOpen: false, editingGuideLesson: null }),
-
   openBulkImportModal: () => set({ isBulkImportModalOpen: true }),
   closeBulkImportModal: () => set({ isBulkImportModalOpen: false }),
   openDestroyModal: () => set({ isDestroyModalOpen: true }),
   closeDestroyModal: () => set({ isDestroyModalOpen: false }),
-
-  saveCategory: async (input) => {
-    const editing = get().editingCategory;
-    set({ isSaving: true });
-
-    try {
-      const endpoint = editing
-        ? `/api/admin/categories/${editing.id}`
-        : "/api/admin/categories";
-      const method = editing ? "PATCH" : "POST";
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-
-      const payload = (await response.json()) as {
-        error?: string;
-        categories?: Category[];
-        questions?: LessonQuestion[];
-        stats?: PracticeStats;
-      };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to save category");
-      }
-
-      set((state) => ({
-        categories: payload.categories ?? state.categories,
-        questions: payload.questions ?? state.questions,
-        stats: payload.stats ?? state.stats,
-        isSaving: false,
-        isCategoryModalOpen: false,
-        editingCategory: null,
-        notice: {
-          id: Date.now(),
-          type: "success",
-          message: editing
-            ? `Updated category "${input.name}"`
-            : `Created category "${input.name}"`,
-        },
-      }));
-    } catch (error) {
-      set({
-        isSaving: false,
-        notice: {
-          id: Date.now(),
-          type: "error",
-          message:
-            error instanceof Error ? error.message : "Failed to save category",
-        },
-      });
-    }
-  },
 
   deleteCategory: async (id) => {
     set({ isSaving: true });
@@ -308,59 +203,6 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
-  saveQuestion: async (input) => {
-    const editing = get().editingQuestion;
-    set({ isSaving: true });
-
-    try {
-      const endpoint = editing
-        ? `/api/admin/questions/${editing.id}`
-        : "/api/admin/questions";
-      const method = editing ? "PATCH" : "POST";
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-
-      const payload = (await response.json()) as {
-        error?: string;
-        categories?: Category[];
-        questions?: LessonQuestion[];
-        stats?: PracticeStats;
-      };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to save question");
-      }
-
-      set((state) => ({
-        categories: payload.categories ?? state.categories,
-        questions: payload.questions ?? state.questions,
-        stats: payload.stats ?? state.stats,
-        isSaving: false,
-        isQuestionModalOpen: false,
-        editingQuestion: null,
-        notice: {
-          id: Date.now(),
-          type: "success",
-          message: editing ? "Question updated" : "New question added",
-        },
-      }));
-    } catch (error) {
-      set({
-        isSaving: false,
-        notice: {
-          id: Date.now(),
-          type: "error",
-          message:
-            error instanceof Error ? error.message : "Failed to save question",
-        },
-      });
-    }
-  },
-
   deleteQuestion: async (id) => {
     set({ isSaving: true });
     try {
@@ -400,6 +242,46 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             error instanceof Error
               ? error.message
               : "Failed to delete question",
+        },
+      });
+    }
+  },
+
+  deleteGuideLesson: async (id) => {
+    set({ isSaving: true });
+    try {
+      const response = await fetch(`/api/admin/guide-lessons/${id}`, {
+        method: "DELETE",
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        guideLessons?: TenseLesson[];
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Failed to delete guide lesson");
+      }
+
+      set((state) => ({
+        guideLessons: payload.guideLessons ?? state.guideLessons,
+        isSaving: false,
+        notice: {
+          id: Date.now(),
+          type: "success",
+          message: "Guide lesson deleted",
+        },
+      }));
+    } catch (error) {
+      set({
+        isSaving: false,
+        notice: {
+          id: Date.now(),
+          type: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to delete guide lesson",
         },
       });
     }
@@ -500,99 +382,6 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         },
       });
       return false;
-    }
-  },
-
-  saveGuideLesson: async (input) => {
-    const editing = get().editingGuideLesson;
-    set({ isSaving: true });
-
-    try {
-      const endpoint = editing
-        ? `/api/admin/guide-lessons/${editing.id}`
-        : "/api/admin/guide-lessons";
-      const method = editing ? "PATCH" : "POST";
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-
-      const payload = (await response.json()) as {
-        error?: string;
-        guideLessons?: TenseLesson[];
-      };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to save guide lesson");
-      }
-
-      set((state) => ({
-        guideLessons: payload.guideLessons ?? state.guideLessons,
-        isSaving: false,
-        isGuideModalOpen: false,
-        editingGuideLesson: null,
-        notice: {
-          id: Date.now(),
-          type: "success",
-          message: editing
-            ? `Updated lesson "${input.title}"`
-            : `Added lesson "${input.title}"`,
-        },
-      }));
-    } catch (error) {
-      set({
-        isSaving: false,
-        notice: {
-          id: Date.now(),
-          type: "error",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Failed to save guide lesson",
-        },
-      });
-    }
-  },
-
-  deleteGuideLesson: async (id) => {
-    set({ isSaving: true });
-    try {
-      const response = await fetch(`/api/admin/guide-lessons/${id}`, {
-        method: "DELETE",
-      });
-
-      const payload = (await response.json()) as {
-        error?: string;
-        guideLessons?: TenseLesson[];
-      };
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to delete guide lesson");
-      }
-
-      set((state) => ({
-        guideLessons: payload.guideLessons ?? state.guideLessons,
-        isSaving: false,
-        notice: {
-          id: Date.now(),
-          type: "success",
-          message: "Guide lesson deleted",
-        },
-      }));
-    } catch (error) {
-      set({
-        isSaving: false,
-        notice: {
-          id: Date.now(),
-          type: "error",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Failed to delete guide lesson",
-        },
-      });
     }
   },
 

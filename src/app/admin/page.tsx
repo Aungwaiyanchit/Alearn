@@ -5,14 +5,28 @@ import { resolveDatabasePath } from "@/db/config";
 import { listGuideLessons, listGuideTips } from "@/db/guide-repository";
 import { getPracticeStats, listCategories } from "@/db/repository";
 import { isLocalAdminServerPageAllowed } from "@/lib/local-only";
+import type { AdminTab } from "@/store/use-admin-store";
 
 export const dynamic = "force-dynamic";
 
-export default async function LocalAdminPage() {
+const ALLOWED_TABS = new Set<AdminTab>(["questions", "categories", "guide"]);
+
+interface LocalAdminPageProps {
+  searchParams: Promise<{ tab?: string }>;
+}
+
+export default async function LocalAdminPage({
+  searchParams,
+}: LocalAdminPageProps) {
   const allowed = await isLocalAdminServerPageAllowed();
   if (!allowed) {
     notFound();
   }
+
+  const resolvedParams = await searchParams;
+  const requestedTab = resolvedParams.tab as AdminTab | undefined;
+  const initialTab: AdminTab =
+    requestedTab && ALLOWED_TABS.has(requestedTab) ? requestedTab : "questions";
 
   const categories = listCategories();
   const questions = listAllQuestions();
@@ -23,6 +37,7 @@ export default async function LocalAdminPage() {
 
   return (
     <AdminShell
+      initialTab={initialTab}
       initialCategories={categories}
       initialQuestions={questions}
       initialGuideLessons={guideLessons}

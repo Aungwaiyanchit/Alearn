@@ -9,22 +9,20 @@ import {
   X,
   XCircle,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminStatsBar } from "@/components/admin/AdminStatsBar";
 import { BulkCsvImportModal } from "@/components/admin/BulkCsvImportModal";
-import { CategoryFormModal } from "@/components/admin/CategoryFormModal";
 import { CategoryManager } from "@/components/admin/CategoryManager";
 import { DestroyAllModal } from "@/components/admin/DestroyAllModal";
-import { GuideLessonFormModal } from "@/components/admin/GuideLessonFormModal";
 import { GuideLessonManager } from "@/components/admin/GuideLessonManager";
-import { QuestionFormModal } from "@/components/admin/QuestionFormModal";
 import { QuestionManager } from "@/components/admin/QuestionManager";
-import { useAdminStore } from "@/store/use-admin-store";
+import { type AdminTab, useAdminStore } from "@/store/use-admin-store";
 import type { TenseLesson, WritingTip } from "@/types/guide";
 import type { Category, LessonQuestion, PracticeStats } from "@/types/practice";
 
 interface AdminShellProps {
+  initialTab: AdminTab;
   initialCategories: Category[];
   initialQuestions: LessonQuestion[];
   initialGuideLessons: TenseLesson[];
@@ -34,6 +32,7 @@ interface AdminShellProps {
 }
 
 export function AdminShell({
+  initialTab,
   initialCategories,
   initialQuestions,
   initialGuideLessons,
@@ -41,7 +40,6 @@ export function AdminShell({
   initialStats,
   databasePath,
 }: AdminShellProps) {
-  const hydratedRef = useRef(false);
   const hydrateInitial = useAdminStore((state) => state.hydrateInitial);
   const activeTab = useAdminStore((state) => state.activeTab);
   const setActiveTab = useAdminStore((state) => state.setActiveTab);
@@ -49,19 +47,18 @@ export function AdminShell({
   const clearNotice = useAdminStore((state) => state.clearNotice);
 
   useEffect(() => {
-    if (!hydratedRef.current) {
-      hydratedRef.current = true;
-      hydrateInitial({
-        categories: initialCategories,
-        questions: initialQuestions,
-        guideLessons: initialGuideLessons,
-        guideTips: initialGuideTips,
-        stats: initialStats,
-        databasePath,
-      });
-    }
+    hydrateInitial({
+      activeTab: initialTab,
+      categories: initialCategories,
+      questions: initialQuestions,
+      guideLessons: initialGuideLessons,
+      guideTips: initialGuideTips,
+      stats: initialStats,
+      databasePath,
+    });
   }, [
     hydrateInitial,
+    initialTab,
     initialCategories,
     initialQuestions,
     initialGuideLessons,
@@ -82,7 +79,7 @@ export function AdminShell({
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
-      <AdminHeader />
+      <AdminHeader databasePath={databasePath} />
 
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8">
         <AdminStatsBar />
@@ -168,9 +165,6 @@ export function AdminShell({
         {activeTab === "guide" && <GuideLessonManager />}
       </main>
 
-      <CategoryFormModal />
-      <QuestionFormModal />
-      <GuideLessonFormModal />
       <BulkCsvImportModal />
       <DestroyAllModal />
     </div>

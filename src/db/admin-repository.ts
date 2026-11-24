@@ -98,6 +98,14 @@ export function listAllQuestions(): LessonQuestion[] {
   return rows.map(mapQuestionRow);
 }
 
+export function getCategoryById(id: string): Category | null {
+  return listCategories().find((category) => category.id === id) ?? null;
+}
+
+export function getQuestionById(id: string): LessonQuestion | null {
+  return listAllQuestions().find((question) => question.id === id) ?? null;
+}
+
 export function createCategory(input: CategoryMutationInput): Category {
   const db = getDb();
   const id = `cat-${randomUUID().slice(0, 8)}`;

@@ -4,8 +4,13 @@ import { ArrowLeft, BookOpen, Database, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useAdminStore } from "@/store/use-admin-store";
 
-export function AdminHeader() {
-  const databasePath = useAdminStore((state) => state.databasePath);
+interface AdminHeaderProps {
+  databasePath?: string;
+}
+
+export function AdminHeader({ databasePath }: AdminHeaderProps = {}) {
+  const storeDbPath = useAdminStore((state) => state.databasePath);
+  const resolvedPath = databasePath || storeDbPath || "data/alearn.sqlite";
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
@@ -26,7 +31,7 @@ export function AdminHeader() {
             <p className="mt-0.5 flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
               <Database className="h-3 w-3 shrink-0 text-slate-400" />
               <span className="max-w-xs truncate sm:max-w-md">
-                {databasePath || "data/alearn.sqlite"}
+                {resolvedPath}
               </span>
             </p>
           </div>

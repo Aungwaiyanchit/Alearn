@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil, Plus, Shuffle, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CategoryIcon } from "@/components/categories/CategoryIcon";
 import { PaginationControls } from "@/components/ui/PaginationControls";
@@ -15,12 +16,6 @@ export function CategoryManager() {
   const categoryPage = useAdminStore((state) => state.categoryPage);
   const categoryPageSize = useAdminStore((state) => state.categoryPageSize);
   const isSaving = useAdminStore((state) => state.isSaving);
-  const openCreateCategoryModal = useAdminStore(
-    (state) => state.openCreateCategoryModal,
-  );
-  const openEditCategoryModal = useAdminStore(
-    (state) => state.openEditCategoryModal,
-  );
   const deleteCategory = useAdminStore((state) => state.deleteCategory);
   const setCategoryPage = useAdminStore((state) => state.setCategoryPage);
   const setCategoryPageSize = useAdminStore(
@@ -55,14 +50,13 @@ export function CategoryManager() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={openCreateCategoryModal}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-stone-800"
+        <Link
+          href="/admin/categories/new"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700"
         >
           <Plus className="h-3.5 w-3.5" />
           <span>New Category</span>
-        </button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -114,14 +108,13 @@ export function CategoryManager() {
                 </button>
 
                 <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => openEditCategoryModal(category)}
-                    className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50"
+                  <Link
+                    href={`/admin/categories/${category.id}/edit`}
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                     <span>Edit</span>
-                  </button>
+                  </Link>
 
                   {isConfirming ? (
                     <div className="flex items-center gap-1">

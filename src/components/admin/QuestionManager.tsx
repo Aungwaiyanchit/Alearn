@@ -9,6 +9,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/ui/PaginationControls";
 import { DIFFICULTY_STYLES } from "@/lib/category-styles";
@@ -47,14 +48,8 @@ export function QuestionManager() {
   const setQuestionPageSize = useAdminStore(
     (state) => state.setQuestionPageSize,
   );
-  const openCreateQuestionModal = useAdminStore(
-    (state) => state.openCreateQuestionModal,
-  );
   const openBulkImportModal = useAdminStore(
     (state) => state.openBulkImportModal,
-  );
-  const openEditQuestionModal = useAdminStore(
-    (state) => state.openEditQuestionModal,
   );
   const deleteQuestion = useAdminStore((state) => state.deleteQuestion);
 
@@ -148,15 +143,24 @@ export function QuestionManager() {
             <span>Bulk Import CSV</span>
           </button>
 
-          <button
-            type="button"
-            onClick={openCreateQuestionModal}
-            disabled={regularCategories.length === 0}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-stone-800 disabled:opacity-50"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span>New Question</span>
-          </button>
+          {regularCategories.length > 0 ? (
+            <Link
+              href={
+                filterCategoryId !== "all"
+                  ? `/admin/questions/new?categoryId=${filterCategoryId}`
+                  : "/admin/questions/new"
+              }
+              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>New Question</span>
+            </Link>
+          ) : (
+            <span className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-xl bg-slate-300 px-4 py-2 text-xs font-semibold text-white">
+              <Plus className="h-3.5 w-3.5" />
+              <span>New Question</span>
+            </span>
+          )}
         </div>
       </div>
 
@@ -281,14 +285,13 @@ export function QuestionManager() {
                     </div>
 
                     <div className="flex shrink-0 items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => openEditQuestionModal(question)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50"
+                      <Link
+                        href={`/admin/questions/${question.id}/edit`}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                         <span>Edit</span>
-                      </button>
+                      </Link>
 
                       {isConfirming ? (
                         <div className="flex items-center gap-1">
