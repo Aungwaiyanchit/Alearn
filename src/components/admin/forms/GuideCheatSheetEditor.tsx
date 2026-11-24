@@ -8,6 +8,7 @@ export interface EditableCheatRow extends LessonCheatSheetRow {
 }
 
 interface GuideCheatSheetEditorProps {
+  sectionId?: string;
   rows: EditableCheatRow[];
   onChange: (next: EditableCheatRow[]) => void;
 }
@@ -23,6 +24,7 @@ export function createEmptyCheatRow(index: number): EditableCheatRow {
 }
 
 export function GuideCheatSheetEditor({
+  sectionId = "section-cheat-sheet",
   rows,
   onChange,
 }: GuideCheatSheetEditorProps) {
@@ -39,7 +41,10 @@ export function GuideCheatSheetEditor({
   };
 
   return (
-    <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+    <section
+      id={sectionId}
+      className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-sm font-bold text-slate-900">

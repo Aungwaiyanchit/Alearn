@@ -8,6 +8,7 @@ export interface EditableGuideExample extends TenseExample {
 }
 
 interface GuideExamplesEditorProps {
+  sectionId?: string;
   examples: EditableGuideExample[];
   onChange: (next: EditableGuideExample[]) => void;
 }
@@ -24,6 +25,7 @@ export function createEmptyExample(index: number): EditableGuideExample {
 }
 
 export function GuideExamplesEditor({
+  sectionId = "section-examples",
   examples,
   onChange,
 }: GuideExamplesEditorProps) {
@@ -40,7 +42,10 @@ export function GuideExamplesEditor({
   };
 
   return (
-    <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+    <section
+      id={sectionId}
+      className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-sm font-bold text-slate-900">

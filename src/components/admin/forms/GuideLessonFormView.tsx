@@ -10,6 +10,7 @@ import {
   type EditableCheatRow,
   GuideCheatSheetEditor,
 } from "@/components/admin/forms/GuideCheatSheetEditor";
+import { GuideEditorSidebar } from "@/components/admin/forms/GuideEditorSidebar";
 import {
   createEmptyExample,
   type EditableGuideExample,
@@ -30,6 +31,7 @@ const LEVELS: Difficulty[] = ["beginner", "intermediate", "advanced"];
 
 interface GuideLessonFormViewProps {
   initialLesson?: TenseLesson | null;
+  allLessons: TenseLesson[];
   categories: Category[];
   guideTips: WritingTip[];
   databasePath: string;
@@ -37,6 +39,7 @@ interface GuideLessonFormViewProps {
 
 export function GuideLessonFormView({
   initialLesson = null,
+  allLessons,
   categories,
   guideTips,
   databasePath,
@@ -210,467 +213,505 @@ export function GuideLessonFormView({
 
   return (
     <AdminFormLayout
+      wide
       title={isEditing ? "Edit Guide Lesson" : "Create Guide Lesson"}
-      subtitle="Author English tense and grammar explanations, formulas, Burmese examples, cheat sheets, and tips in full-page view."
+      subtitle="Author English tense and grammar explanations, formulas, Burmese examples, cheat sheets, and tips."
       backHref="/admin?tab=guide"
       backLabel="Back to Lessons Guide"
       databasePath={databasePath}
       error={error}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        {/* 1. Core Info */}
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <h2 className="text-sm font-bold text-slate-900">
-            Basic Information
-          </h2>
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+        <div className="lg:sticky lg:top-24 lg:col-span-3">
+          <GuideEditorSidebar
+            currentLessonId={initialLesson?.id ?? null}
+            allLessons={allLessons}
+            exampleCount={
+              examples.filter((ex) => ex.burmese.trim() || ex.english.trim())
+                .length
+            }
+            cheatSheetCount={
+              cheatSheet.filter(
+                (row) => row.pattern.trim() || row.english.trim(),
+              ).length
+            }
+            selectedTipsCount={relatedTipIds.length}
+          />
+        </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="guide-title"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Lesson Title *
-              </label>
-              <input
-                id="guide-title"
-                type="text"
-                required
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                placeholder="e.g., used to (Past Habits)"
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/15"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-mm-title"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Burmese Title (မြန်မာခေါင်းစဉ်) *
-              </label>
-              <input
-                id="guide-mm-title"
-                type="text"
-                required
-                value={burmeseTitle}
-                onChange={(event) => setBurmeseTitle(event.target.value)}
-                placeholder="ဥပမာ - အရင်က လုပ်လေ့ရှိခဲ့တယ်"
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-myanmar text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/15"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <div>
-              <label
-                htmlFor="guide-track"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Track
-              </label>
-              <SelectDropdown
-                id="guide-track"
-                size="sm"
-                ariaLabel="Lesson track"
-                value={track}
-                options={[
-                  { value: "tenses", label: "Tenses" },
-                  { value: "grammar", label: "Grammar Rule" },
-                ]}
-                onChange={(nextValue) =>
-                  setTrack(nextValue as Exclude<LessonTrack, "all">)
-                }
-                className="mt-1.5"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-subgroup"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Subgroup Label
-              </label>
-              <input
-                id="guide-subgroup"
-                type="text"
-                value={subgroup}
-                onChange={(event) => setSubgroup(event.target.value)}
-                placeholder="e.g., Past Habits"
-                className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 shadow-2xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-level"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Difficulty Level
-              </label>
-              <SelectDropdown
-                id="guide-level"
-                size="sm"
-                ariaLabel="Difficulty level"
-                value={level}
-                options={LEVELS.map((lvl) => ({
-                  value: lvl,
-                  label: lvl.charAt(0).toUpperCase() + lvl.slice(1),
-                }))}
-                onChange={(nextValue) => setLevel(nextValue as Difficulty)}
-                className="mt-1.5"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-practice-cat"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Practice Link
-              </label>
-              <SelectDropdown
-                id="guide-practice-cat"
-                size="sm"
-                ariaLabel="Linked practice category"
-                value={practiceCategoryId}
-                options={[
-                  {
-                    value: "random-mix",
-                    label: "Random Mix",
-                    description: "ကဏ္ဍစုံမှ ကျပန်း",
-                  },
-                  ...categories
-                    .filter((cat) => !cat.isRandom)
-                    .map((cat) => ({
-                      value: cat.id,
-                      label: cat.name,
-                      description: cat.burmeseName,
-                    })),
-                ]}
-                onChange={setPracticeCategoryId}
-                className="mt-1.5"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="guide-summary"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                English Summary *
-              </label>
-              <textarea
-                id="guide-summary"
-                required
-                rows={3}
-                value={summary}
-                onChange={(event) => setSummary(event.target.value)}
-                placeholder="Explain clearly when and how this tense or rule is used."
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-mm-summary"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Burmese Summary (မြန်မာရှင်းလင်းချက်)
-              </label>
-              <textarea
-                id="guide-mm-summary"
-                rows={3}
-                value={burmeseSummary}
-                onChange={(event) => setBurmeseSummary(event.target.value)}
-                placeholder="မြန်မာလို အတိုချုပ် ရှင်းပြချက်..."
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-myanmar text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* 2. Timeline & Formulas */}
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <h2 className="text-sm font-bold text-slate-900">
-            Timeline &amp; Sentence Structure Formulas
-          </h2>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="guide-timeline"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Timeline Visual Style
-              </label>
-              <SelectDropdown
-                id="guide-timeline"
-                size="sm"
-                ariaLabel="Timeline visual style"
-                value={timelineType}
-                options={TIMELINE_TYPE_OPTIONS}
-                onChange={(nextValue) =>
-                  setTimelineType(nextValue as TimelineVisualType)
-                }
-                className="mt-1.5"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-timeline-caption"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Timeline Caption
-              </label>
-              <input
-                id="guide-timeline-caption"
-                type="text"
-                value={timelineCaption}
-                onChange={(event) => setTimelineCaption(event.target.value)}
-                placeholder="e.g., Repeated in the past, stopped before NOW"
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <TenseTimelineVisual
-              type={timelineType}
-              caption={timelineCaption || "Live timeline preview"}
-            />
-          </div>
-
-          <div className="mt-5 flex flex-col gap-3">
-            <div>
-              <label
-                htmlFor="guide-f-pos"
-                className="block text-xs font-semibold text-emerald-700"
-              >
-                + Positive Formula *
-              </label>
-              <input
-                id="guide-f-pos"
-                type="text"
-                required
-                value={formulaPositive}
-                onChange={(event) => setFormulaPositive(event.target.value)}
-                placeholder="Subject + used to + V1"
-                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-mono text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-f-neg"
-                className="block text-xs font-semibold text-rose-700"
-              >
-                − Negative Formula
-              </label>
-              <input
-                id="guide-f-neg"
-                type="text"
-                value={formulaNegative}
-                onChange={(event) => setFormulaNegative(event.target.value)}
-                placeholder="Subject + did not (didn't) + use to + V1"
-                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-mono text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-f-q"
-                className="block text-xs font-semibold text-blue-700"
-              >
-                ? Question Formula
-              </label>
-              <input
-                id="guide-f-q"
-                type="text"
-                value={formulaQuestion}
-                onChange={(event) => setFormulaQuestion(event.target.value)}
-                placeholder="Did + Subject + use to + V1 ...?"
-                className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-mono text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* 3. When to Use & Signal Words */}
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <h2 className="text-sm font-bold text-slate-900">
-            Usage &amp; Signal Words
-          </h2>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="guide-when"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                When to Use (one bullet point per line)
-              </label>
-              <textarea
-                id="guide-when"
-                rows={4}
-                value={whenToUseText}
-                onChange={(event) => setWhenToUseText(event.target.value)}
-                placeholder={
-                  "Past habits you stopped doing\nPast living places or states"
-                }
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs leading-relaxed text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-signals"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Signal Words (comma separated)
-              </label>
-              <textarea
-                id="guide-signals"
-                rows={4}
-                value={signalWordsText}
-                onChange={(event) => setSignalWordsText(event.target.value)}
-                placeholder="when I was young, in the past, before, years ago"
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs leading-relaxed text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* 4. Worked Examples */}
-        <GuideExamplesEditor examples={examples} onChange={setExamples} />
-
-        {/* 5. Common Mistake */}
-        <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <h2 className="text-sm font-bold text-slate-900">
-            Common Mistake Callout
-          </h2>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="guide-wrong"
-                className="block text-xs font-semibold text-rose-700"
-              >
-                Wrong Sentence (Avoid)
-              </label>
-              <input
-                id="guide-wrong"
-                type="text"
-                value={mistakeWrong}
-                onChange={(event) => setMistakeWrong(event.target.value)}
-                placeholder="e.g., Did you used to live here?"
-                className="mt-1.5 w-full rounded-xl border border-rose-200 bg-rose-50/30 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-rose-400 focus:bg-white"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="guide-correct"
-                className="block text-xs font-semibold text-emerald-700"
-              >
-                Correct Sentence (Write)
-              </label>
-              <input
-                id="guide-correct"
-                type="text"
-                value={mistakeCorrect}
-                onChange={(event) => setMistakeCorrect(event.target.value)}
-                placeholder="e.g., Did you use to live here?"
-                className="mt-1.5 w-full rounded-xl border border-emerald-200 bg-emerald-50/30 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:bg-white"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="guide-reason"
-                className="block text-xs font-semibold text-slate-700"
-              >
-                Explanation
-              </label>
-              <input
-                id="guide-reason"
-                type="text"
-                value={mistakeReason}
-                onChange={(event) => setMistakeReason(event.target.value)}
-                placeholder="Explain briefly why the correction works."
-                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* 6. Cheat Sheet Rows */}
-        <GuideCheatSheetEditor rows={cheatSheet} onChange={setCheatSheet} />
-
-        {/* 7. Related Tips */}
-        {guideTips.length > 0 && (
-          <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-6 lg:col-span-9"
+        >
+          {/* 1. Core Info */}
+          <section
+            id="section-basics"
+            className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs"
+          >
             <h2 className="text-sm font-bold text-slate-900">
-              Related Tips &amp; Tricks
+              Basic Information
             </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              Select tips to show underneath this lesson detail.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {guideTips.map((tip) => {
-                const selected = relatedTipIds.includes(tip.id);
-                return (
-                  <button
-                    key={tip.id}
-                    type="button"
-                    onClick={() => toggleTipId(tip.id)}
-                    className={`rounded-xl border px-3.5 py-2 text-xs font-semibold transition ${
-                      selected
-                        ? "border-blue-600 bg-blue-50 text-blue-800"
-                        : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white"
-                    }`}
-                  >
-                    {tip.title}
-                  </button>
-                );
-              })}
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="guide-title"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Lesson Title *
+                </label>
+                <input
+                  id="guide-title"
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="e.g., used to (Past Habits)"
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/15"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-mm-title"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Burmese Title (မြန်မာခေါင်းစဉ်) *
+                </label>
+                <input
+                  id="guide-mm-title"
+                  type="text"
+                  required
+                  value={burmeseTitle}
+                  onChange={(event) => setBurmeseTitle(event.target.value)}
+                  placeholder="ဥပမာ - အရင်က လုပ်လေ့ရှိခဲ့တယ်"
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-myanmar text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/15"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-4">
+              <div>
+                <label
+                  htmlFor="guide-track"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Track
+                </label>
+                <SelectDropdown
+                  id="guide-track"
+                  size="sm"
+                  ariaLabel="Lesson track"
+                  value={track}
+                  options={[
+                    { value: "tenses", label: "Tenses" },
+                    { value: "grammar", label: "Grammar Rule" },
+                  ]}
+                  onChange={(nextValue) =>
+                    setTrack(nextValue as Exclude<LessonTrack, "all">)
+                  }
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-subgroup"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Subgroup Label
+                </label>
+                <input
+                  id="guide-subgroup"
+                  type="text"
+                  value={subgroup}
+                  onChange={(event) => setSubgroup(event.target.value)}
+                  placeholder="e.g., Past Habits"
+                  className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 shadow-2xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-level"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Difficulty Level
+                </label>
+                <SelectDropdown
+                  id="guide-level"
+                  size="sm"
+                  ariaLabel="Difficulty level"
+                  value={level}
+                  options={LEVELS.map((lvl) => ({
+                    value: lvl,
+                    label: lvl.charAt(0).toUpperCase() + lvl.slice(1),
+                  }))}
+                  onChange={(nextValue) => setLevel(nextValue as Difficulty)}
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-practice-cat"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Practice Link
+                </label>
+                <SelectDropdown
+                  id="guide-practice-cat"
+                  size="sm"
+                  ariaLabel="Linked practice category"
+                  value={practiceCategoryId}
+                  options={[
+                    {
+                      value: "random-mix",
+                      label: "Random Mix",
+                      description: "ကဏ္ဍစုံမှ ကျပန်း",
+                    },
+                    ...categories
+                      .filter((cat) => !cat.isRandom)
+                      .map((cat) => ({
+                        value: cat.id,
+                        label: cat.name,
+                        description: cat.burmeseName,
+                      })),
+                  ]}
+                  onChange={setPracticeCategoryId}
+                  className="mt-1.5"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="guide-summary"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  English Summary *
+                </label>
+                <textarea
+                  id="guide-summary"
+                  required
+                  rows={3}
+                  value={summary}
+                  onChange={(event) => setSummary(event.target.value)}
+                  placeholder="Explain clearly when and how this tense or rule is used."
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-mm-summary"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Burmese Summary (မြန်မာရှင်းလင်းချက်)
+                </label>
+                <textarea
+                  id="guide-mm-summary"
+                  rows={3}
+                  value={burmeseSummary}
+                  onChange={(event) => setBurmeseSummary(event.target.value)}
+                  placeholder="မြန်မာလို အတိုချုပ် ရှင်းပြချက်..."
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-myanmar text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
             </div>
           </section>
-        )}
 
-        {/* Sticky Footer Bar */}
-        <div className="sticky bottom-4 z-20 flex items-center justify-end gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-md backdrop-blur-md">
-          <Link
-            href="/admin?tab=guide"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+          {/* 2. Timeline & Formulas */}
+          <section
+            id="section-formulas"
+            className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs"
           >
-            Cancel
-          </Link>
-          <button
-            type="submit"
-            disabled={
-              isSaving ||
-              !title.trim() ||
-              !burmeseTitle.trim() ||
-              !summary.trim() ||
-              !formulaPositive.trim()
-            }
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 disabled:opacity-60"
+            <h2 className="text-sm font-bold text-slate-900">
+              Timeline &amp; Sentence Structure Formulas
+            </h2>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="guide-timeline"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Timeline Visual Style
+                </label>
+                <SelectDropdown
+                  id="guide-timeline"
+                  size="sm"
+                  ariaLabel="Timeline visual style"
+                  value={timelineType}
+                  options={TIMELINE_TYPE_OPTIONS}
+                  onChange={(nextValue) =>
+                    setTimelineType(nextValue as TimelineVisualType)
+                  }
+                  className="mt-1.5"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-timeline-caption"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Timeline Caption
+                </label>
+                <input
+                  id="guide-timeline-caption"
+                  type="text"
+                  value={timelineCaption}
+                  onChange={(event) => setTimelineCaption(event.target.value)}
+                  placeholder="e.g., Repeated in the past, stopped before NOW"
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <TenseTimelineVisual
+                type={timelineType}
+                caption={timelineCaption || "Live timeline preview"}
+              />
+            </div>
+
+            <div className="mt-5 flex flex-col gap-3">
+              <div>
+                <label
+                  htmlFor="guide-f-pos"
+                  className="block text-xs font-semibold text-emerald-700"
+                >
+                  + Positive Formula *
+                </label>
+                <input
+                  id="guide-f-pos"
+                  type="text"
+                  required
+                  value={formulaPositive}
+                  onChange={(event) => setFormulaPositive(event.target.value)}
+                  placeholder="Subject + used to + V1"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-mono text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-f-neg"
+                  className="block text-xs font-semibold text-rose-700"
+                >
+                  − Negative Formula
+                </label>
+                <input
+                  id="guide-f-neg"
+                  type="text"
+                  value={formulaNegative}
+                  onChange={(event) => setFormulaNegative(event.target.value)}
+                  placeholder="Subject + did not (didn't) + use to + V1"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-mono text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-f-q"
+                  className="block text-xs font-semibold text-blue-700"
+                >
+                  ? Question Formula
+                </label>
+                <input
+                  id="guide-f-q"
+                  type="text"
+                  value={formulaQuestion}
+                  onChange={(event) => setFormulaQuestion(event.target.value)}
+                  placeholder="Did + Subject + use to + V1 ...?"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 font-mono text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* 3. When to Use & Signal Words */}
+          <section
+            id="section-usage"
+            className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs"
           >
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            <span>{isEditing ? "Save Lesson" : "Create Lesson"}</span>
-          </button>
-        </div>
-      </form>
+            <h2 className="text-sm font-bold text-slate-900">
+              Usage &amp; Signal Words
+            </h2>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="guide-when"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  When to Use (one bullet point per line)
+                </label>
+                <textarea
+                  id="guide-when"
+                  rows={4}
+                  value={whenToUseText}
+                  onChange={(event) => setWhenToUseText(event.target.value)}
+                  placeholder={
+                    "Past habits you stopped doing\nPast living places or states"
+                  }
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs leading-relaxed text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-signals"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Signal Words (comma separated)
+                </label>
+                <textarea
+                  id="guide-signals"
+                  rows={4}
+                  value={signalWordsText}
+                  onChange={(event) => setSignalWordsText(event.target.value)}
+                  placeholder="when I was young, in the past, before, years ago"
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs leading-relaxed text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* 4. Worked Examples */}
+          <GuideExamplesEditor examples={examples} onChange={setExamples} />
+
+          {/* 5. Common Mistake */}
+          <section
+            id="section-mistake"
+            className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs"
+          >
+            <h2 className="text-sm font-bold text-slate-900">
+              Common Mistake Callout
+            </h2>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="guide-wrong"
+                  className="block text-xs font-semibold text-rose-700"
+                >
+                  Wrong Sentence (Avoid)
+                </label>
+                <input
+                  id="guide-wrong"
+                  type="text"
+                  value={mistakeWrong}
+                  onChange={(event) => setMistakeWrong(event.target.value)}
+                  placeholder="e.g., Did you used to live here?"
+                  className="mt-1.5 w-full rounded-xl border border-rose-200 bg-rose-50/30 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-rose-400 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="guide-correct"
+                  className="block text-xs font-semibold text-emerald-700"
+                >
+                  Correct Sentence (Write)
+                </label>
+                <input
+                  id="guide-correct"
+                  type="text"
+                  value={mistakeCorrect}
+                  onChange={(event) => setMistakeCorrect(event.target.value)}
+                  placeholder="e.g., Did you use to live here?"
+                  className="mt-1.5 w-full rounded-xl border border-emerald-200 bg-emerald-50/30 px-3.5 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:bg-white"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="guide-reason"
+                  className="block text-xs font-semibold text-slate-700"
+                >
+                  Explanation
+                </label>
+                <input
+                  id="guide-reason"
+                  type="text"
+                  value={mistakeReason}
+                  onChange={(event) => setMistakeReason(event.target.value)}
+                  placeholder="Explain briefly why the correction works."
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 bg-slate-50/70 px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* 6. Cheat Sheet Rows */}
+          <GuideCheatSheetEditor rows={cheatSheet} onChange={setCheatSheet} />
+
+          {/* 7. Related Tips */}
+          {guideTips.length > 0 && (
+            <section
+              id="section-tips"
+              className="scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs"
+            >
+              <h2 className="text-sm font-bold text-slate-900">
+                Related Tips &amp; Tricks
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-500">
+                Select tips to show underneath this lesson detail.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {guideTips.map((tip) => {
+                  const selected = relatedTipIds.includes(tip.id);
+                  return (
+                    <button
+                      key={tip.id}
+                      type="button"
+                      onClick={() => toggleTipId(tip.id)}
+                      className={`rounded-xl border px-3.5 py-2 text-xs font-semibold transition ${
+                        selected
+                          ? "border-blue-600 bg-blue-50 text-blue-800"
+                          : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white"
+                      }`}
+                    >
+                      {tip.title}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Sticky Footer Bar */}
+          <div className="sticky bottom-4 z-20 flex items-center justify-end gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-md backdrop-blur-md">
+            <Link
+              href="/admin?tab=guide"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Cancel
+            </Link>
+            <button
+              type="submit"
+              disabled={
+                isSaving ||
+                !title.trim() ||
+                !burmeseTitle.trim() ||
+                !summary.trim() ||
+                !formulaPositive.trim()
+              }
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 disabled:opacity-60"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              <span>{isEditing ? "Save Lesson" : "Create Lesson"}</span>
+            </button>
+          </div>
+        </form>
+      </div>
     </AdminFormLayout>
   );
 }

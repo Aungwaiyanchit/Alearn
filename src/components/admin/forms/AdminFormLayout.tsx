@@ -10,6 +10,7 @@ interface AdminFormLayoutProps {
   backHref: string;
   backLabel: string;
   databasePath: string;
+  wide?: boolean;
   error?: string | null;
   children: React.ReactNode;
 }
@@ -20,6 +21,7 @@ export function AdminFormLayout({
   backHref,
   backLabel,
   databasePath,
+  wide = false,
   error,
   children,
 }: AdminFormLayoutProps) {
@@ -27,7 +29,11 @@ export function AdminFormLayout({
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
       <AdminHeader databasePath={databasePath} />
 
-      <main className="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 lg:py-10">
+      <main
+        className={`mx-auto flex flex-col gap-6 px-4 py-8 sm:px-6 lg:py-10 ${
+          wide ? "max-w-6xl" : "max-w-4xl"
+        }`}
+      >
         <div>
           <Link
             href={backHref}
