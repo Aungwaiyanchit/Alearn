@@ -26,6 +26,7 @@ export interface DestroyAllSummary {
   deletedCategories: number;
   deletedQuestions: number;
   deletedAttempts: number;
+  deletedGuideLessons: number;
 }
 
 interface QuestionRow {
@@ -418,14 +419,19 @@ export function destroyAllData(): DestroyAllSummary {
   let deletedCategories = 0;
   let deletedQuestions = 0;
   let deletedAttempts = 0;
+  let deletedGuideLessons = 0;
 
   const tx = db.transaction(() => {
     deletedAttempts = db.prepare("DELETE FROM attempts").run().changes;
     db.prepare("DELETE FROM category_questions").run();
     deletedQuestions = db.prepare("DELETE FROM questions").run().changes;
     deletedCategories = db.prepare("DELETE FROM categories").run().changes;
+    deletedGuideLessons = db.prepare("DELETE FROM guide_lessons").run().changes;
     db.prepare(
       "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('initialized', '1')",
+    ).run();
+    db.prepare(
+      "INSERT OR REPLACE INTO app_meta (key, value) VALUES ('guide_initialized', '1')",
     ).run();
   });
 
@@ -435,5 +441,6 @@ export function destroyAllData(): DestroyAllSummary {
     deletedCategories,
     deletedQuestions,
     deletedAttempts,
+    deletedGuideLessons,
   };
 }

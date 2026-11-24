@@ -1,3 +1,11 @@
+import type {
+  CommonMistake,
+  LessonCheatSheetRow,
+  LessonTrack,
+  TenseExample,
+  TenseFormula,
+  TimelineVisualType,
+} from "@/types/guide";
 import type { Difficulty } from "@/types/practice";
 
 export interface CategoryMutationInput {
@@ -17,6 +25,41 @@ export interface QuestionMutationInput {
   grammarNote: string;
   difficulty: Difficulty;
 }
+
+export interface GuideLessonMutationInput {
+  title: string;
+  burmeseTitle: string;
+  track: Exclude<LessonTrack, "all">;
+  subgroup: string;
+  level: Difficulty;
+  summary: string;
+  burmeseSummary: string;
+  timelineType: TimelineVisualType;
+  timelineCaption: string;
+  formula: TenseFormula;
+  whenToUse: string[];
+  signalWords: string[];
+  examples: TenseExample[];
+  mistake: CommonMistake;
+  cheatSheet: LessonCheatSheetRow[];
+  relatedTipIds: string[];
+  practiceCategoryId: string;
+}
+
+export const TIMELINE_TYPE_OPTIONS: Array<{
+  value: TimelineVisualType;
+  label: string;
+}> = [
+  { value: "rule-pattern", label: "Grammar Pattern" },
+  { value: "habit", label: "Repeating Habit" },
+  { value: "now-ongoing", label: "Happening Now" },
+  { value: "past-to-now", label: "Past → Now Bridge" },
+  { value: "past-point", label: "Past Point" },
+  { value: "past-ongoing", label: "Past Ongoing" },
+  { value: "past-habit", label: "Stopped Past Habit (used to)" },
+  { value: "future-point", label: "Future Point (will)" },
+  { value: "planned-future", label: "Planned Future (going to)" },
+];
 
 export const CATEGORY_ICON_OPTIONS = [
   { value: "message-circle", label: "Chat" },

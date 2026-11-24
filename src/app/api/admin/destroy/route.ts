@@ -24,6 +24,7 @@ export async function DELETE(request: Request) {
       deleted,
       categories: listCategories(),
       questions: [],
+      guideLessons: [],
       stats: getPracticeStats(),
     });
   } catch (error) {
